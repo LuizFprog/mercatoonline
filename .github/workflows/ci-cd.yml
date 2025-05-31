@@ -64,6 +64,9 @@ jobs:
     - name: Install dependencies
       run: pnpm install --prod --ignore-workspace
     
+    - name: Install Nest CLI globally
+      run: pnpm add -g @nestjs/cli # para garantir que o Nest CLI esteja disponível 
+
     - name: Build project
       run: pnpm build
     
