@@ -62,7 +62,7 @@ jobs:
         node-version: '20'
     
     - name: Install dependencies
-      run: pnpm install --prod
+      run: pnpm install --prod --ignore-workspace
     
     - name: Build project
       run: pnpm build
