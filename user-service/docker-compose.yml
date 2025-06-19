@@ -1,0 +1,33 @@
+version: '3.8'
+
+services:
+  # Serviço da sua aplicação NestJS
+  app:
+    container_name: user_service_app
+    build: . # Constrói a imagem a partir do Dockerfile na mesma pasta
+    ports:
+      - "3001:3000" # Mapeia a porta 3000 do container para a 3001 da sua máquina
+    environment:
+      # A URL de conexão que a aplicação usará para falar com o banco de dados
+      DATABASE_URL: "postgresql://docker:docker@db:5432/user_db?schema=public"
+    depends_on:
+      - db # Garante que o container do banco de dados inicie antes da aplicação
+    volumes:
+      - .:/usr/src/app
+      - /usr/src/app/node_modules # Evita que o node_modules local sobrescreva o do container
+
+  # Serviço do banco de dados PostgreSQL
+  db:
+    container_name: user_service_db
+    image: postgres:15 # Use uma imagem oficial do Postgres
+    ports:
+      - "5432:5432" # Expõe a porta do Postgres para a sua máquina local
+    environment:
+      POSTGRES_USER: docker
+      POSTGRES_PASSWORD: docker
+      POSTGRES_DB: user_db
+    volumes:
+      - pgdata:/var/lib/postgresql/data # Garante que os dados persistam ao reiniciar o container
+
+volumes:
+  pgdata: # Define o volume nomeado para persistência de dados
