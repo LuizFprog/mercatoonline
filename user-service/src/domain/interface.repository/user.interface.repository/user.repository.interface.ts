@@ -1,9 +1,12 @@
-import { User } from '../../entities/user/user'
+import { User } from '@prisma/client';
 
 export const IUserRepository = Symbol('IUserRepository');
 
 export interface IUserRepository {
-  findById(id: number): Promise<User | null>;
-  findByEmail(email: string): Promise<User | null>;
-  create(data: Omit<User, 'id' | 'createdAt' | 'updatedAt' | 'addresses'>): Promise<User>;
+  findById(id: number);
+  findByEmail(email: string);
+  findAll();
+  create(data: Omit<User, 'id' | 'createdAt' | 'updatedAt' | 'addresses'>);
+  update(id: number, data: Partial<User>);
+  delete(id: number): Promise<void>;
 }

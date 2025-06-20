@@ -3,10 +3,11 @@ import { UsersController } from '../../interfaces/controllers/users/users.contro
 import { CreateUserUseCase } from '../../application/use-cases/create-user/create-user';
 import { FindUserByIdUseCase } from '../../application/use-cases/find-user-by-id/find-user-by-id'
 import { FindByEmail } from '../../application/use-cases/find.by.email/find.by.email'
-import { UpdateUserUseCase } from '../../application/use-cases/updat-user/updat-user';
+import { UpdateUserUseCase } from '../../application/use-cases/update-user/update-user';
 import { DeleteUserUseCase } from '../../application/use-cases/delete-user/delete.user';
 import { DatabaseModule } from '../database/database.module';
 import { PrismaModule } from '../prisma/prisma.module'
+import { FindUserAll } from 'src/application/use-cases/find.all.user/find.all.user';
 
 @Module({
   imports: [
@@ -17,6 +18,7 @@ import { PrismaModule } from '../prisma/prisma.module'
     CreateUserUseCase,
     FindUserByIdUseCase,
     FindByEmail,
+    FindUserAll,
     UpdateUserUseCase,
     DeleteUserUseCase,
   ],

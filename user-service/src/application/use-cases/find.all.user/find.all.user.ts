@@ -3,13 +3,13 @@ import { IUserRepository } from '../../../domain/interface.repository/user.inter
 import { User } from '@prisma/client';
 
 @Injectable()
-export class FindUserByIdUseCase {
+export class FindUserAll {
   constructor(
     @Inject(IUserRepository)
     private readonly userRepository: IUserRepository,
   ) {}
 
-  async execute(id: number): Promise<User | null> {
-    return await this.userRepository.findById(id);
+  async execute(): Promise<User[] | null> {
+    return await this.userRepository.findAll();
   }
 }

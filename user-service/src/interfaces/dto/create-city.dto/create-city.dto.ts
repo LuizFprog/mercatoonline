@@ -8,5 +8,5 @@ export class CreateCityDto {
 
   @IsInt()
   @IsNotEmpty()
-  stateId: number;
+  stateId: number;  
 }

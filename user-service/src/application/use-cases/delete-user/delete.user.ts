@@ -1,6 +1,7 @@
 import { Inject, Injectable } from '@nestjs/common';
 import { IUserRepository } from 'src/domain/interface.repository/user.interface.repository/user.repository.interface';
-import { User } from 'src/domain/entities/user/user';
+import { User } from '@prisma/client';
+import { promises } from 'dns';
 
 @Injectable()
 export class DeleteUserUseCase {
@@ -9,7 +10,7 @@ export class DeleteUserUseCase {
     private readonly userRepository: IUserRepository,
   ) {}
 
-  async execute(id:number) {
-    return '';
+  async execute(id:number):Promise<void> {
+    this.userRepository.delete(id);
   }
 }

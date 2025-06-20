@@ -1,6 +1,6 @@
 import { Inject, Injectable } from '@nestjs/common';
 import { IUserRepository } from 'src/domain/interface.repository/user.interface.repository/user.repository.interface';
-import { User } from 'src/domain/entities/user/user';
+import { User } from '@prisma/client';
 
 @Injectable()
 export class FindByEmail {
@@ -10,6 +10,6 @@ export class FindByEmail {
   ) {}
 
   async execute(email:string): Promise<User | null> {
-    return this.userRepository.findByEmail(email);
+    return await this.userRepository.findByEmail(email);
   }
 }
