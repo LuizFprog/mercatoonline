@@ -31,7 +31,7 @@ export class UserPrismaRepository implements IUserRepository {
   constructor(private readonly prisma: PrismaService) {}
 
   async findById(id: number) {
-    return this.prisma.user.findUnique({
+    return await this.prisma.user.findUnique({
       where: { id },
       select: this.userSelect,
     });
@@ -45,7 +45,7 @@ export class UserPrismaRepository implements IUserRepository {
   }
 
   async findAll() {
-    return this.prisma.user.findMany({
+    return await this.prisma.user.findMany({
       select: this.userSelect,
     });
   }
@@ -54,7 +54,7 @@ export class UserPrismaRepository implements IUserRepository {
     
     const { address, ...userData } = data;
 
-    return this.prisma.user.create({
+    return await this.prisma.user.create({
       data: {
         ...userData,
         addresses: {

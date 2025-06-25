@@ -1,12 +1,12 @@
 import { Module } from '@nestjs/common';
-import { UsersController } from '../../interfaces/controllers/users/users.controller';
-import { CreateUserUseCase } from '../../application/use-cases/create-user/create-user';
-import { FindUserByIdUseCase } from '../../application/use-cases/find-user-by-id/find-user-by-id'
-import { FindByEmail } from '../../application/use-cases/find.by.email/find.by.email'
-import { UpdateUserUseCase } from '../../application/use-cases/update-user/update-user';
-import { DeleteUserUseCase } from '../../application/use-cases/delete-user/delete.user';
-import { DatabaseModule } from '../database/database.module';
-import { PrismaModule } from '../prisma/prisma.module'
+import { UsersController } from 'src/interfaces/controllers/users/users.controller';
+import { CreateUserUseCase } from 'src/application/use-cases/create-user/create-user';
+import { FindUserByIdUseCase } from 'src/application/use-cases/find-user-by-id/find-user-by-id'
+import { FindByEmail } from 'src/application/use-cases/find.by.email/find.by.email'
+import { UpdateUserUseCase } from 'src/application/use-cases/update-user/update-user';
+import { DeleteUserUseCase } from 'src/application/use-cases/delete-user/delete.user';
+import { DatabaseModule } from 'src/infrastructure/database/database.module';
+import { PrismaModule } from 'src/infrastructure/prisma/prisma.module'
 import { FindUserAll } from 'src/application/use-cases/find.all.user/find.all.user';
 
 @Module({

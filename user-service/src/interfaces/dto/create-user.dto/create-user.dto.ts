@@ -29,8 +29,8 @@ export class CreateUserDto {
   password: string;
 
   @IsNotEmpty()
-  @ValidateNested() // Diz ao class-validator para validar o objeto aninhado também
-  @Type(() => CreateAddressDto) // Diz ao class-transformer qual classe usar para o objeto aninhado
+  @ValidateNested() 
+  @Type(() => CreateAddressDto) 
   address: CreateAddressDto;
 
 }
