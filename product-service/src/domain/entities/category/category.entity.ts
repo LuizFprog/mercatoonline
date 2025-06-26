@@ -1,4 +1,3 @@
-// src/domain/entities/category/category.entity.ts
 import { Product } from '../products/product.entity';
 
 export class Category {

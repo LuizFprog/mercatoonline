@@ -1,5 +1,3 @@
-// Local: src/infrastructure/modules/categories.module.ts
-
 import { Module } from '@nestjs/common';
 import { PrismaModule } from '../prisma/prisma.module';
 import { CategoriesController } from 'src/interfaces/controllers/categories.controller';

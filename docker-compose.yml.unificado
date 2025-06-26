@@ -1,0 +1,81 @@
+//Define todos os 10 containers (5 aplicações + 5 bancos de dados).
+version: '3.8'
+
+services:
+  # --- User Service ---
+  user-service:
+    container_name: user_service_app
+    build:
+      context: ./user-service # Caminho para a pasta do User.Service
+      dockerfile: Dockerfile
+    ports:
+      - "3001:3000"
+    environment:
+      DATABASE_URL: "postgresql://user:password@user-db:5432/user_db"
+    depends_on:
+      user-db:
+        condition: service_healthy
+
+  user-db:
+    container_name: user_service_db
+    image: postgres:15
+    environment:
+      POSTGRES_USER: user
+      POSTGRES_PASSWORD: password
+      POSTGRES_DB: user_db
+    ports:
+      - "5432:5432"
+    volumes:
+      - user_pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready --username=user --dbname=user_db"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  # --- Product Service ---
+  product-service:
+    container_name: product_service_app
+    build:
+      context: ./product-service # Caminho para a pasta do Product.Service
+      dockerfile: Dockerfile
+    ports:
+      - "3002:3000" # Porta 3002 para não conflitar com outros serviços
+    environment:
+      DATABASE_URL: "postgresql://user:password@product-db:5432/product_db"
+    depends_on:
+      product-db:
+        condition: service_healthy
+
+  product-db:
+    container_name: product_service_db
+    image: postgres:15
+    environment:
+      POSTGRES_USER: user
+      POSTGRES_PASSWORD: password
+      POSTGRES_DB: product_db
+    ports:
+      - "5433:5432" # Porta 5433 para não conflitar com outros bancos
+    volumes:
+      - product_pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready --username=user --dbname=product_db"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  # --- Cart Service ---
+  # (Defina aqui o cart-service e cart-db, seguindo o mesmo padrão)
+
+  # --- Order Service ---
+  # (Defina aqui o order-service e order-db, seguindo o mesmo padrão)
+
+  # --- Payment Service ---
+  # (Defina aqui o payment-service e payment-db, seguindo o mesmo padrão)
+
+volumes:
+  user_pgdata:
+  product_pgdata:
+  # cart_pgdata:
+  # order_pgdata:
+  # payment_pgdata:

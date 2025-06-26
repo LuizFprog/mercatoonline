@@ -1,4 +1,3 @@
-// Em src/infrastructure/database/repositories/category-prisma.repository.service.ts
 import { Injectable } from '@nestjs/common';
 import { ICategoryRepository } from 'src/domain/repository/ICategoryRepository';
 import { PrismaService } from 'src/infrastructure/prisma/prisma.service';

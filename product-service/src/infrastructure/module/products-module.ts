@@ -1,11 +1,8 @@
-// products.module.ts
 import { Module } from '@nestjs/common';
 import { PrismaModule } from 'src/infrastructure/prisma/prisma.module'; 
 import { IProductRepository } from 'src/domain/repository/IProductRepository'; 
 import { ProductPrismaRepositoryService } from 'src/infrastructure/database/repositories/product/product-prisma.repository.service'; 
 import { ProductsController } from 'src/interfaces/controllers/products.controller';
-
-// Importe TODOS os seus serviços de use case
 import { CreateProductService } from 'src/application/use-cases/product/create-product/create-product';
 import { DeleteProductService } from 'src/application/use-cases/product/delete-product/delete-product';
 import { FindProductAllService } from 'src/application/use-cases/product/find-product-all/find-product-all';
