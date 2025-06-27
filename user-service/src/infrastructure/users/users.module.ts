@@ -11,7 +11,7 @@ import { FindUserAll } from 'src/application/use-cases/find.all.user/find.all.us
 
 @Module({
   imports: [
-    DatabaseModule,PrismaModule, // Importa o módulo que exporta o IUserRepository
+    DatabaseModule,PrismaModule, 
   ],
   controllers: [UsersController],
   providers: [

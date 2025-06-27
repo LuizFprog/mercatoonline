@@ -1,5 +1,3 @@
-// src/interfaces/controllers/users/users.controller.ts
-
 import { Controller, Get, Param, Patch, Post, Delete, Body, ParseIntPipe } from '@nestjs/common';
 import { CreateUserUseCase } from 'src/application/use-cases/create-user/create-user';
 import { FindUserByIdUseCase } from 'src/application/use-cases/find-user-by-id/find-user-by-id';

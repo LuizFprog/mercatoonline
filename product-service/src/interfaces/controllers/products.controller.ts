@@ -1,4 +1,4 @@
-import { Body, Controller,Delete,Get, Param, Patch, Post } from '@nestjs/common';
+import { Body, Controller,Delete,Get, Param, Patch, Post,ParseIntPipe } from '@nestjs/common';
 import { CreateProductService } from 'src/application/use-cases/product/create-product/create-product'
 import { FindProductAllService } from 'src/application/use-cases/product/find-product-all/find-product-all'
 import { FindProductByIdService } from 'src/application/use-cases/product/find-product-by-id/find-product-by-id'
@@ -27,7 +27,7 @@ export class ProductsController {
 
 
     @Get(':id')
-    findById(@Param('id') id:number){
+    findById(@Param('id',ParseIntPipe) id:number){
         return this.findproductsid.execute(id)
     }
 
@@ -37,7 +37,7 @@ export class ProductsController {
     }  
 
     @Get('categories/:id')
-    findByCategoryProduct(@Param('id') id:number){
+    findByCategoryProduct(@Param('id',ParseIntPipe) id:number){
       return this.findcategoryproduct.execute(id)
     }
 
@@ -57,12 +57,12 @@ export class ProductsController {
     }
 
     @Patch(':id')
-    updateProducts(@Param('id') id: number, @Body() data: UpdateProductsDTO){
+    updateProducts(@Param('id',ParseIntPipe) id: number, @Body() data: UpdateProductsDTO){
         return this.updateproduct.execute(id,data)
     }
 
     @Delete(':id')
-    DeleteProductService(@Param('id') id:number){
+    DeleteProductService(@Param('id',ParseIntPipe) id:number){
         return this.deleteproduct.execute(id)
     }
 }

@@ -12,6 +12,7 @@ import { OrderController } from 'src/interface/controller/order.controller';
     imports:[PrismaModule],
     controllers:[OrderController],
     providers:[
+        OrderPrismaRepository,
         {
             provide:IOrderProductService,
             useClass: OrderPrismaRepository
@@ -22,4 +23,4 @@ import { OrderController } from 'src/interface/controller/order.controller';
         FindbyidOrderProductService
     ]
 })
-export class OrderModuleModule {}
+export class OrderModule {}

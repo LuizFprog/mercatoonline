@@ -12,75 +12,147 @@ export class ProductPrismaRepositoryService implements IProductRepository {
 
     // --- Create PRODUCTS ---
     async create(data: CreateProductDto) {
-        return await this.prisma.product.create({
-            data: {
-                name: data.name,
-                price: data.price,
-                image: data.image,
-                category: {
-                    connect: {
-                        id: data.categoryId 
+        try{ 
+            return await this.prisma.product.create({
+                data: {
+                    name: data.name,
+                    price: data.price,
+                    image: data.image,
+                    brand: data.brand,
+                    batch: data.batch,
+                    validity: data.validity,
+                    category: {
+                        connect: {
+                            id: data.categoryId 
+                        }
                     }
                 }
-            }
-        });
+            });
+        }
+        catch(error){
+            throw new Error(`Error creating product: ${error.message}`);
+        }
     }
 
     // --- MÉTODO FIND CAGEGORY BY ID ---
     async findByCategoryId(id: number) {
-        return await this.prisma.product.findMany({
-            where:{id:id},
-        })    
+        try{
+            const products = await this.prisma.product.findMany({
+            where:{categoryId:id},
+            })    
+            if(!products){
+                throw new Error(`No products found for category ID ${id}`);
+            }
+
+            return products;
+        }
+        catch(error){
+            throw new Error(`Error finding products for category ID ${id}: ${error.message}`);
+        }
+        
     }
 
     // --- MÉTODO FIND ALL ---
     async findAll() {
-        return await this.prisma.product.findMany({
+
+        try{
+            const productsAll = await this.prisma.product.findMany({
             include: {
                 category: true, 
             }
-        });
+            });
+            return productsAll;
+        }
+        catch(error){
+            throw new Error(`Error fetching all products: ${error.message}`);
+        }
     }
 
     // --- MÉTODO FIND ALL CATEGORIES ---
     async findAllCategory() {
-      return await this.prisma.product.findMany()
-  }
+        try{
+            return await this.prisma.product.findMany()
+        }
+        catch(error){
+            throw new Error(`Error fetching all categories: ${error.message}`);     
+        }
+    }
 
     // --- MÉTODO FIND BY ID ---
     async findById(id: number) {
-        return await this.prisma.product.findUnique({
+        try{
+            const productById = await this.prisma.product.findUnique({
             where: {
                 id: id 
-            },
-            include: {
-                category: {
-                    select: { 
-                        name: true
+                },
+                include: {
+                    category: {
+                        select: { 
+                            name: true
+                        }
                     }
                 }
+            });
+            if (!productById) {
+                console.error(`Product with ID ${id} not found.`);
             }
-        });
+            return productById;
+        }
+        catch (error) {
+            throw new Error(`Error finding product by ID ${id}: ${error.message}`); 
+        }
+        
     }
-
 
     // --- MÉTODO UPDATE ---
     async update(id: number, data: UpdateProductsDTO) {
-        return await this.prisma.product.update({
+        
+        try{
+            const findbyid = await this.prisma.product.findUnique({
+                where: { 
+                    id: id 
+                }
+            });
+            
+            if (!findbyid) {
+                throw new Error(`Product with ID ${id} not found.`);
+            }
+
+            return await this.prisma.product.update({
             where: { 
                 id: id 
             },
-            data: data // O DTO já contém os campos que podem ser atualizados
-        });
+                data: data // O DTO já contém os campos que podem ser atualizados
+            });
+
+        }
+        catch (error) {
+            console.error(`Error updating product with ID ${id}: ${error.message}`);    
+            throw new Error(`Error updating product with ID ${id}: ${error.message}`);}
+        
     }
 
     // --- MÉTODO DELETE ---
     async delete(id: number) {
-        return await this.prisma.product.delete({
-            where: { 
-                id: id 
-            }
-        });
+
+        try{
+            const findbyid = await this.prisma.product.findUnique({
+                where:{id:id},
+            })
+            if (!findbyid) {
+                throw new Error(`Product with ID ${id} not found.`);
+            }   
+
+            return await this.prisma.product.delete({
+                where: { 
+                    id: id 
+                }
+            });
+
+        }
+        catch (error) {
+            throw new Error(`Error deleting product with ID ${id}: ${error.message}`);
+        }
     }
 
     // --- MÉTODO FIND BY PRICE ---
@@ -91,36 +163,42 @@ export class ProductPrismaRepositoryService implements IProductRepository {
      */
     async findByPriceRange(data:priceDTO) {
 
-        const {price1,price2} = data;
+        try{
+            const {price1,price2} = data;
 
-        const whereClause: any = {
-            AND: [] 
-        };
+            const whereClause: any = {
+                AND: [] 
+            };
 
-        if (price1 !== undefined) {
-            whereClause.AND.push({
-                price: {
-                    gte: price1 
-                }
-            });
-        }
-
-        if (price2 !== undefined) {
-            whereClause.AND.push({
-                price: {
-                    lte: price2 
-                }
-            });
-        }
-        
-        return await this.prisma.product.findMany({
-          
-            where: whereClause,
-            include: {
-                category: {
-                    select: { name: true }
-                }
+            if (price1 !== undefined) {
+                whereClause.AND.push({
+                    price: {
+                        gte: price1 
+                    }
+                });
             }
-        });
+
+            if (price2 !== undefined) {
+                whereClause.AND.push({
+                    price: {
+                        lte: price2 
+                    }
+                });
+            }
+            
+            return await this.prisma.product.findMany({
+            
+                where: whereClause,
+                include: {
+                    category: {
+                        select: { name: true }
+                    }
+                }
+            });
+        }
+
+        catch (error) {
+            throw new Error(`Error finding products by price range: ${error.message}`);
+        }
     }
 }

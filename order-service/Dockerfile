@@ -1,22 +1,25 @@
-# Instala todas as dependências (dev e prod) e constrói o projeto.
+# STAGE 1: builder - Compila o código TypeScript para JavaScript
 FROM node:18-alpine AS builder
 WORKDIR /usr/src/app
 COPY package*.json ./
 RUN npm install
 COPY . .
-
-RUN npx prisma generate
 RUN npm run build
 
-# Instala SOMENTE as dependências de produção e copia o build.
+
+# STAGE 2: production - Cria a imagem final e otimizada
 FROM node:18-alpine
 WORKDIR /usr/src/app
+
+# Instala o OpenSSL, que é uma dependência do Query Engine do Prisma no Alpine
+RUN apk add --no-cache openssl
+
 COPY package*.json ./
 RUN npm install --only=production
-COPY --from=builder /usr/src/app/dist ./dist
 
-COPY --from=builder /usr/src/app/prisma ./prisma
-COPY --from=builder /usr/src/app/node_modules/.prisma ./node_modules/.prisma
+COPY --from=builder /usr/src/app/dist ./dist
+COPY prisma ./prisma
+RUN npx prisma generate
 
 EXPOSE 3000
-CMD ["node", "dist/main"]
+CMD ["sh", "-c", "npx prisma db push && node dist/main"]

@@ -1,22 +1,29 @@
-# Instala todas as dependências (dev e prod) e constrói o projeto.
-FROM node:18-alpine AS builder
+# Usando a imagem base robusta e compatível
+FROM node:18-slim
+
+# Instala a dependência do sistema operacional (OpenSSL) que o Prisma precisa
+RUN apt-get update && apt-get install -y openssl libssl3 && rm -rf /var/lib/apt/lists/*
+
+# Define o diretório de trabalho
 WORKDIR /usr/src/app
+
+# Copia os arquivos de manifesto de pacotes
 COPY package*.json ./
+
+# Instala as dependências do Node.js
 RUN npm install
+
+# Copia todo o código-fonte
 COPY . .
 
+# Gera o cliente do Prisma
 RUN npx prisma generate
+
+# Constrói a aplicação NestJS
 RUN npm run build
 
-# Instala SOMENTE as dependências de produção e copia o build.
-FROM node:18-alpine
-WORKDIR /usr/src/app
-COPY package*.json ./
-RUN npm install --only=production
-COPY --from=builder /usr/src/app/dist ./dist
-
-COPY --from=builder /usr/src/app/prisma ./prisma
-COPY --from=builder /usr/src/app/node_modules/.prisma ./node_modules/.prisma
-
+# Expõe a porta da aplicação
 EXPOSE 3000
-CMD ["node", "dist/main"]
+
+# Comando para iniciar a aplicação em modo de produção
+CMD [ "node", "dist/main" ]

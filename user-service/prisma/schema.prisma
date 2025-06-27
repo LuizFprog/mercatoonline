@@ -1,5 +1,6 @@
 generator client {
   provider = "prisma-client-js"
+  binaryTargets = ["native", "debian-openssl-1.1.x"]
 }
 
 datasource db {
@@ -24,7 +25,7 @@ model User {
 
 model Address {
   id          Int      @id @default(autoincrement())
-  street      String 
+  street      String
   number      Int
   complement  String?
   cep         String

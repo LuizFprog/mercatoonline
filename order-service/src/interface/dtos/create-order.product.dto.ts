@@ -1,5 +1,4 @@
-import { Type } from 'class-transformer';
-import { IsInt, IsNotEmpty, IsArray, ValidateNested, Min, IsNumber } from 'class-validator';
+import { IsInt, IsNotEmpty, Min, IsNumber } from 'class-validator';
 
 export class OrderProductDto {
   @IsInt()

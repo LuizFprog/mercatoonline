@@ -1,6 +1,6 @@
 generator client {
-  provider = "prisma-client-js"
-  output   = "../generated/prisma"
+  provider      = "prisma-client-js"
+  binaryTargets = ["native", "linux-musl"]
 }
 
 datasource db {
@@ -10,7 +10,7 @@ datasource db {
 
 model Order {
   id        Int      @id @default(autoincrement())
-  userId    Int      @map("user_id") // A partir do id do cliente o front pode pegar os demais dados do Microsservilo User.Service. 
+  userId    Int      @map("user_id") 
   addressId Int      @map("address_id") 
   date      DateTime @default(now())
   paymentId Int?     @map("payment_id") 

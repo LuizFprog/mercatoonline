@@ -12,6 +12,5 @@ export class Product {
   updatedAt: Date; 
   categoryId: number;
 
-  // Propriedade para a relação, que pode ser preenchida pelo Prisma
   category?: Category;
 }

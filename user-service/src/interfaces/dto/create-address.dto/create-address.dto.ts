@@ -1,4 +1,3 @@
-// user-service/src/interfaces/address/dto/create-address.dto.ts
 import { IsString, IsNotEmpty, IsInt, IsOptional, IsNumber } from 'class-validator';
 
 

@@ -1,4 +1,4 @@
-import { Controller, Post, Body, Get,Param} from '@nestjs/common';
+import { Controller, Post, Body, Get,Param,ParseIntPipe} from '@nestjs/common';
 import { CreateCategoryProduct } from 'src/application/use-cases/category/create-category-product/create-category-product';
 import { FindProductCatagoryService } from 'src/application/use-cases/category/find-product-category/find-product-category'
 import { CreateCategoryDto } from 'src/interfaces/dtos/create.category/create.category';
@@ -18,7 +18,7 @@ export class CategoriesController {
   }
 
   @Get(':id')
-  findByCaterory(@Param('id') id:number){
+  findByCaterory(@Param('id',ParseIntPipe) id:number){
       return this.findproductcategory.execute(id)
   }
 

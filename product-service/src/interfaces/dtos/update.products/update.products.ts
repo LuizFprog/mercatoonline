@@ -23,7 +23,6 @@ export class UpdateProductsDTO{
   @IsString()
   validity?: string;
 
-
   @IsUrl()
   @IsNotEmpty()
   image?: string;

@@ -5,7 +5,5 @@ export class Category {
   name: string;
   createdAt: Date;
   updatedAt: Date;
-
-  // Propriedade para a relação inversa
   products?: Product[];
 }

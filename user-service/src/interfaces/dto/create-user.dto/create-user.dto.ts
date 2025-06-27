@@ -1,4 +1,4 @@
-// user-service/src/interfaces/user/dto/create-user.dto.ts
+
 import { IsString, IsNotEmpty, IsEmail, IsInt, Min, Max, Length,MinLength,ValidateNested } from 'class-validator';
 import { Type } from 'class-transformer'
 import { CreateAddressDto } from '../create-address.dto/create-address.dto'
