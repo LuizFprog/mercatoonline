@@ -37,8 +37,8 @@ O **Mercato Online** é uma plataforma de **marketplace digital** que visa conec
 
 ## 👥 Público Alvo
 
-- **Empresas** de pequeno e médio porte, especialmente da região Nordeste do Brasil
-- **Pessoas físicas** interessadas em comprar ou vender produtos localmente
+- **Empresas de venda de produtos**
+- **Pessoas físicas com consumidores**
 
 ---
 
@@ -116,13 +116,6 @@ A monetização da plataforma será baseada em:
 | **Botpress**     | Plataforma para chatbot com IA                 |
 | **Phaser.js**    | Biblioteca de jogos 2D (gamificação)           |
 | **Redis**        | Banco de dados em cache                        |
-
----
-
-## 📂 Repositório e Gerência
-
-- **GitHub**: [`github.com/LuizFprog/mercatoonline`](https://github.com/LuizFprog/mercatoonline)
-- **Jira**: Projeto Kanban com tarefas e backlog (acesso: `andreaziz@gmail.com`)
 
 ---
 
