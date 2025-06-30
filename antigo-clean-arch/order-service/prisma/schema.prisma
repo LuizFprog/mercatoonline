@@ -1,0 +1,38 @@
+generator client {
+  provider      = "prisma-client-js"
+  binaryTargets = ["native", "linux-musl"]
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Order {
+  id        Int      @id @default(autoincrement())
+  userId    Int      @map("user_id") 
+  addressId Int      @map("address_id") 
+  date      DateTime @default(now())
+  paymentId Int?     @map("payment_id") 
+
+  createdAt DateTime @default(now()) @map("created_at") 
+  updatedAt DateTime @updatedAt @map("updated_at") 
+
+  orderProducts OrderProduct[]
+
+  @@map("orders")
+}
+
+model OrderProduct {
+  id        Int      @id @default(autoincrement())
+  productId Int      @map("product_id")  // ID do produto original (ex: do Microsserviço de Product.Service)
+  amount    Int      // Quantidade
+  price     Float    // Preço no momento da compra recebido do microsserviço Produtos
+
+  createdAt DateTime @default(now()) @map("created_at") 
+  updatedAt DateTime @updatedAt @map("updated_at")   
+  orderId Int   @map("order_id") 
+  order   Order @relation(fields: [orderId], references: [id], onDelete: Cascade) 
+
+  @@map("order_products") 
+}

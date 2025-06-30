@@ -1,0 +1,63 @@
+generator client {
+  provider = "prisma-client-js"
+  binaryTargets = ["native", "debian-openssl-1.1.x"]
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id        Int       @id @default(autoincrement())
+  name      String
+  cpf       String    @unique
+  email     String    @unique
+  typeUser  Int
+  phone     String
+  password  String
+  createdAt DateTime  @default(now()) @map("created_at")
+  updatedAt DateTime  @updatedAt @map("updated_at")
+  addresses Address[]
+
+  @@map("users")
+}
+
+model Address {
+  id          Int      @id @default(autoincrement())
+  street      String
+  number      Int
+  complement  String?
+  cep         String
+  createdAt   DateTime @default(now()) @map("created_at")
+  updatedAt   DateTime @updatedAt @map("updated_at")
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId      Int      @map("user_id")
+  city        City     @relation(fields: [cityId], references: [id])
+  cityId      Int      @map("city_id")
+
+  @@map("addresses")
+}
+
+model City {
+  id        Int      @id
+  name      String
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+  state     State    @relation(fields: [stateId], references: [id])
+  stateId   Int      @map("state_id")
+  addresses Address[]
+
+  @@map("cities")
+}
+
+model State {
+  id        Int      @id
+  name      String
+  uf        String   @unique
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+  cities    City[]
+
+  @@map("states")
+}
