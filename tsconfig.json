@@ -17,24 +17,24 @@
     "incremental": true,
     "skipLibCheck": true,
     "paths": {
-      "@desen-web/common": [
-        "libs/common/src"
-      ],
-      "@desen-web/common/*": [
-        "libs/common/src/*"
-      ],
       "@desen-web/api-users": [
         "apps/api-users/src"
       ],
       "@desen-web/api-users/*": [
         "apps/api-users/src/*"
       ],
+      "@desen-web/common": [
+        "libs/common/src"
+      ],
+      "@desen-web/common/*": [
+        "libs/common/src/*"
+      ],
       "@desen-web/users": [
         "apps/users/src"
       ],
       "@desen-web/users/*": [
         "apps/users/src/*"
-      ],
+      ]
     },
     "plugins": [
       {
@@ -44,5 +44,9 @@
     ],
     "resolveJsonModule": true
   },
-  "exclude": ["node_modules", "dist", "**/*.d.ts"]
+  "exclude": [
+    "node_modules",
+    "dist",
+    "**/*.d.ts"
+  ]
 }

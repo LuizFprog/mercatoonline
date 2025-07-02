@@ -72,3 +72,6 @@ sonar-scanner
 
 # Eslint 
 .eslintcache
+
+# pasta das implementações antigas
+/backup

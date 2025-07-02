@@ -6,7 +6,9 @@
   "compilerOptions": {
     "webpack": true,
     "tsConfigPath": "apps/api-users/tsconfig.app.json",
-    "assets": ["apps/api-users/src/assets/i18n/**/*"]
+    "assets": [
+      "apps/api-users/src/assets/i18n/**/*"
+    ]
   },
   "projects": {
     "api-users": {
