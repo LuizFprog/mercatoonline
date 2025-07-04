@@ -1,26 +1,32 @@
 import { Module } from '@nestjs/common';
 import { UsersController } from 'src/interfaces/controllers/users/users.controller';
-import { CreateUserUseCase } from 'src/application/use-cases/create-user/create-user';
-import { FindUserByIdUseCase } from 'src/application/use-cases/find-user-by-id/find-user-by-id'
-import { FindByEmail } from 'src/application/use-cases/find.by.email/find.by.email'
-import { UpdateUserUseCase } from 'src/application/use-cases/update-user/update-user';
-import { DeleteUserUseCase } from 'src/application/use-cases/delete-user/delete.user';
+import { CreateUser } from 'src/application/use-cases/create-user';
+import { FindUserById } from 'src/application/use-cases/find-user-by-id';
+import { FindByEmail } from 'src/application/use-cases/find.by.email';
+import { UpdateUser } from 'src/application/use-cases/update-user';
+import { DeleteUser } from 'src/application/use-cases/delete.user';
+import { FindUserAll } from 'src/application/use-cases/find.all.user';
+import { FindByCPF } from 'src/application/use-cases/find.by.cpf';
+import { FindByPhone } from 'src/application/use-cases/find.by.phone';
 import { DatabaseModule } from 'src/infrastructure/database/database.module';
-import { PrismaModule } from 'src/infrastructure/prisma/prisma.module'
-import { FindUserAll } from 'src/application/use-cases/find.all.user/find.all.user';
+import { NatsClientModule } from 'src/infrastructure/messaging/nats-client.module'; 
+
 
 @Module({
   imports: [
-    DatabaseModule,PrismaModule, 
+    DatabaseModule,   // Fornece os repositórios (IUserRepository)
+    NatsClientModule,   // Fornece o cliente NATS (NATS_SERVICE)
   ],
   controllers: [UsersController],
   providers: [
-    CreateUserUseCase,
-    FindUserByIdUseCase,
+    CreateUser,
+    FindUserById,
     FindByEmail,
     FindUserAll,
-    UpdateUserUseCase,
-    DeleteUserUseCase,
+    UpdateUser,
+    DeleteUser,
+    FindByCPF,
+    FindByPhone,
   ],
 })
 export class UsersModule {}

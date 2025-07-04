@@ -1,8 +1,8 @@
 import { Controller,Get, Param,Post,Body,Delete,ParseIntPipe } from '@nestjs/common';
-import { CreateOrderService } from 'src/application/use-cases/Order.Service/create.order/create.order.service'
-import { DeleteOrderService } from 'src/application/use-cases/Order.Service/delete.order/delete.order.service'
-import { FindallorderService } from 'src/application/use-cases/Order.Service/findall.order/findallorder.service'
-import { FindbyidOrderProductService } from 'src/application/use-cases/Order.Service/findbyid.order/findbyid.order-product.service'
+import { CreateOrderService } from 'src/application/use-cases/create.order.service'
+import { DeleteOrderService } from 'src/application/use-cases/delete.order.service'
+import { FindallorderService } from 'src/application/use-cases/findallorder.service'
+import { FindbyidOrderProductService } from 'src/application/use-cases/findbyid.order-product.service'
 import { CreateOrderDto } from 'src/interface/dtos/create-order.dto';
 
 

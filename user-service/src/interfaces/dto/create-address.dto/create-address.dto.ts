@@ -1,11 +1,9 @@
 import { IsString, IsNotEmpty, IsInt, IsOptional, IsNumber } from 'class-validator';
 
-
-
 export class CreateAddressDto {
-  @IsInt()
-  @IsNotEmpty()
-  userId: number;
+  //@IsInt()
+  //@IsNotEmpty()
+  //userId: number;
 
   @IsString()
   @IsOptional()

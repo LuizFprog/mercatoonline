@@ -1,16 +1,15 @@
 import { Injectable } from '@nestjs/common';
 import { IProductRepository } from 'src/domain/repository/IProductRepository';
-import { PrismaService } from 'src/infrastructure/prisma/prisma.service';
-import { CreateProductDto } from 'src/interfaces/dtos/create.products/create.products';
-import { UpdateProductsDTO } from 'src/interfaces/dtos/update.products/update.products';
-import { priceDTO } from 'src/interfaces/dtos/price.DTO/price.DTO'
+import { PrismaService } from 'src/prisma/prisma.service';
+import { CreateProductDto } from 'src/interfaces/dtos/create.products';
+import { UpdateProductsDTO } from 'src/interfaces/dtos/update.products';
+import { priceDTO } from 'src/interfaces/dtos/price.DTO'
 
 @Injectable()
 export class ProductPrismaRepositoryService implements IProductRepository {
     
     constructor(private readonly prisma: PrismaService) {}
 
-    // --- Create PRODUCTS ---
     async create(data: CreateProductDto) {
         try{ 
             return await this.prisma.product.create({
@@ -40,10 +39,6 @@ export class ProductPrismaRepositoryService implements IProductRepository {
             const products = await this.prisma.product.findMany({
             where:{categoryId:id},
             })    
-            if(!products){
-                throw new Error(`No products found for category ID ${id}`);
-            }
-
             return products;
         }
         catch(error){
@@ -93,9 +88,6 @@ export class ProductPrismaRepositoryService implements IProductRepository {
                     }
                 }
             });
-            if (!productById) {
-                console.error(`Product with ID ${id} not found.`);
-            }
             return productById;
         }
         catch (error) {
@@ -106,28 +98,18 @@ export class ProductPrismaRepositoryService implements IProductRepository {
 
     // --- MÉTODO UPDATE ---
     async update(id: number, data: UpdateProductsDTO) {
+        console.log(data+' '+id)
         
         try{
-            const findbyid = await this.prisma.product.findUnique({
-                where: { 
-                    id: id 
-                }
-            });
-            
-            if (!findbyid) {
-                throw new Error(`Product with ID ${id} not found.`);
-            }
-
             return await this.prisma.product.update({
             where: { 
                 id: id 
             },
-                data: data // O DTO já contém os campos que podem ser atualizados
+                data: data 
             });
 
         }
-        catch (error) {
-            console.error(`Error updating product with ID ${id}: ${error.message}`);    
+        catch (error) {   
             throw new Error(`Error updating product with ID ${id}: ${error.message}`);}
         
     }
@@ -136,13 +118,6 @@ export class ProductPrismaRepositoryService implements IProductRepository {
     async delete(id: number) {
 
         try{
-            const findbyid = await this.prisma.product.findUnique({
-                where:{id:id},
-            })
-            if (!findbyid) {
-                throw new Error(`Product with ID ${id} not found.`);
-            }   
-
             return await this.prisma.product.delete({
                 where: { 
                     id: id 
@@ -176,12 +151,26 @@ export class ProductPrismaRepositoryService implements IProductRepository {
                         gte: price1 
                     }
                 });
+            } else{
+                whereClause.AND.push({
+                    price: {
+                        gte: 0 
+                    }
+                });
+
             }
 
             if (price2 !== undefined) {
                 whereClause.AND.push({
                     price: {
                         lte: price2 
+                    }
+                });
+            }
+            else{
+                whereClause.AND.push({
+                    price: {
+                        lte: 10000000
                     }
                 });
             }

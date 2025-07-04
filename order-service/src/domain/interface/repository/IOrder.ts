@@ -1,8 +1,8 @@
 import { CreateOrderDto } from 'src/interface/dtos/create-order.dto'
 
-export const IOrderProductService = Symbol('IOrderProductService');
+export const IOrderRepositoryService = Symbol('IOrderProductService');
 
-export interface IOrderProductService{
+export interface IOrderRepository{
     create(data:CreateOrderDto);
     delete(id:number);
     findbyId(id:number);

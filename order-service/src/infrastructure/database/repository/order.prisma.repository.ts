@@ -1,10 +1,10 @@
 import { Injectable } from "@nestjs/common";
-import { IOrderProductService } from 'src/domain/interface/repository/IOrder';
+import { IOrderRepository } from 'src/domain/interface/repository/IOrder';
 import { CreateOrderDto } from 'src/interface/dtos/create-order.dto'; 
-import { PrismaService } from "src/infrastructure/prisma/prisma-service/prisma.service";
+import { PrismaService } from "src/prisma/prisma-service/prisma.service";
 
 @Injectable() 
-export class OrderPrismaRepository implements IOrderProductService {
+export class OrderPrismaRepository implements IOrderRepository {
 
     constructor(private prisma: PrismaService) {}
 
@@ -43,31 +43,22 @@ export class OrderPrismaRepository implements IOrderProductService {
                     orderProducts: true, 
                 },
             });
-
             return orders
-
-
         }
         catch(error){
             throw new Error(`Error fetching orders: ${error.message}`);
-               
         }
     }
 
     async findbyId(id: number) {
-
         try
         {
             const findOrder = await this.prisma.order.findUnique({
-            where: { id:id },
-            include: {
-                orderProducts: true, 
-            },
+                where: { id:id },
+                include: {
+                    orderProducts: true, 
+                },
             });
-
-            if(!findOrder) {
-                throw new Error(`Order with id ${id} does not exist`);
-            }
             return findOrder;
         }
         catch(error){
@@ -76,16 +67,7 @@ export class OrderPrismaRepository implements IOrderProductService {
     }
 
     async delete(id: number) {
-
-        try{
-            const orderExists = await this.prisma.order.findUnique({
-                where: { id },
-            });
-
-            if (!orderExists) {
-                throw new Error(`Order with id ${id} does not exist`);
-            }
-            
+        try{          
             return this.prisma.order.delete({
                 where: { id },
             });

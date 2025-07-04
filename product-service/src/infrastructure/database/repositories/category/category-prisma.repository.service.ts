@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { ICategoryRepository } from 'src/domain/repository/ICategoryRepository';
-import { PrismaService } from 'src/infrastructure/prisma/prisma.service';
-import { CreateCategoryDto } from 'src/interfaces/dtos/create.category/create.category';
+import { PrismaService } from 'src/prisma/prisma.service';
+import { CreateCategoryDto } from 'src/interfaces/dtos/create.category';
 
 @Injectable()
 export class CategoryPrismaRepositoryService implements ICategoryRepository {
@@ -32,9 +32,7 @@ export class CategoryPrismaRepositoryService implements ICategoryRepository {
 
   async findAllCategory() {
     const categoryAll = await this.prisma.category.findMany();
-    if (categoryAll.length === 0) {
-      throw new Error('No categories found');
-    }
-      return categoryAll;
+    
+    return categoryAll;
   }
 }

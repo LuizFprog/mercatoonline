@@ -1,8 +1,8 @@
 import { Controller, Post, Body, Get,Param,ParseIntPipe} from '@nestjs/common';
-import { CreateCategoryProduct } from 'src/application/use-cases/category/create-category-product/create-category-product';
-import { FindProductCatagoryService } from 'src/application/use-cases/category/find-product-category/find-product-category'
-import { CreateCategoryDto } from 'src/interfaces/dtos/create.category/create.category';
-import { FindAllProductCatagoryService } from 'src/application/use-cases/category/find-all-category/find-all-category';
+import { CreateCategoryProduct } from 'src/application/use-cases/category/create-category-product';
+import { FindProductCatagoryService } from 'src/application/use-cases/category/find-product-category'
+import { CreateCategoryDto } from 'src/interfaces/dtos/create.category';
+import { FindAllProductCatagoryService } from 'src/application/use-cases/category/find-all-category';
 
 @Controller('categories') 
 export class CategoriesController {

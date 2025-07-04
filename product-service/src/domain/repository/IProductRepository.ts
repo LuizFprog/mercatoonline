@@ -1,5 +1,5 @@
 import { Product } from '../entities/products/product.entity'; 
-import { priceDTO } from 'src/interfaces/dtos/price.DTO/price.DTO'
+import { priceDTO } from 'src/interfaces/dtos/price.DTO'
 
 export const IProductRepository = Symbol('IProductRepository');
 

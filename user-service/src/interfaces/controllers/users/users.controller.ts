@@ -1,22 +1,26 @@
 import { Controller, Get, Param, Patch, Post, Delete, Body, ParseIntPipe } from '@nestjs/common';
-import { CreateUserUseCase } from 'src/application/use-cases/create-user/create-user';
-import { FindUserByIdUseCase } from 'src/application/use-cases/find-user-by-id/find-user-by-id';
-import { UpdateUserUseCase } from 'src/application/use-cases/update-user/update-user';
-import { DeleteUserUseCase } from 'src/application/use-cases/delete-user/delete.user';
-import { FindUserAll } from 'src/application/use-cases/find.all.user/find.all.user';
-import { FindByEmail } from 'src/application/use-cases/find.by.email/find.by.email'
+import { CreateUser } from 'src/application/use-cases/create-user';
+import { FindUserById } from 'src/application/use-cases/find-user-by-id';
+import { UpdateUser } from 'src/application/use-cases/update-user';
+import { DeleteUser } from 'src/application/use-cases/delete.user';
+import { FindUserAll } from 'src/application/use-cases/find.all.user';
+import { FindByEmail } from 'src/application/use-cases/find.by.email'
+import { FindByCPF } from 'src/application/use-cases/find.by.cpf';
+import { FindByPhone } from 'src/application/use-cases/find.by.phone';
 import { CreateUserDto } from 'src/interfaces/dto/create-user.dto/create-user.dto';
 import { UpdateUserDto } from 'src/interfaces/dto/update.user.dto/update.user.tdo';
 
 @Controller('users')
 export class UsersController {
     constructor(
-        private readonly createUserUseCase: CreateUserUseCase,
-        private readonly findUserByIdUseCase: FindUserByIdUseCase,
+        private readonly createUser_: CreateUser,
+        private readonly findUserById: FindUserById,
         private readonly findByEmail: FindByEmail,
         private readonly findAllUser: FindUserAll,
-        private readonly updateUserUseCase: UpdateUserUseCase,
-        private readonly deleteUserUseCase: DeleteUserUseCase,
+        private readonly updateUser_: UpdateUser,
+        private readonly deleteUserUseCase: DeleteUser,
+        private readonly findByCPF: FindByCPF,
+        private readonly findByPhone: FindByPhone,
     ) {}
 
     @Get()
@@ -26,7 +30,7 @@ export class UsersController {
 
     @Get(':id')
     findOne(@Param('id', ParseIntPipe) id: number) {
-        return this.findUserByIdUseCase.execute(id);
+        return this.findUserById.execute(id);
     }
 
     @Get(':email')
@@ -34,14 +38,25 @@ export class UsersController {
         return this.findByEmail.execute(email);
     }
 
+    @Get(':cpf')
+    findCPF(@Param('cpf') cpf: string) {
+        return this.findByCPF.execute(cpf);
+    }
+
+    @Get(':phone')
+    findPhone(@Param('phone') phone: string) {
+        return this.findByPhone.execute(phone);
+    }
+
     @Post()
     createUser(@Body() createUserDto: CreateUserDto) {
-        return this.createUserUseCase.execute(createUserDto);
+         console.log(`[UsersController] Requisição POST /users recebida! Body:`, createUserDto);
+        return this.createUser_.execute(createUserDto);
     }
 
     @Patch(':id')
     updateUser(@Param('id', ParseIntPipe) id: number, @Body() updateUserDto: UpdateUserDto) {
-        return this.updateUserUseCase.execute(id, updateUserDto);
+        return this.updateUser_.execute(id, updateUserDto);
     }
     
     @Delete(':id')

@@ -1,38 +1,20 @@
-FROM node:18-slim as builder
-
-# Instala o OpenSSL, uma dependência que o Prisma pode precisar.
-RUN apt-get update && apt-get install -y openssl && rm -rf /var/lib/apt/lists/*
-
+FROM node:18-alpine as builder
 WORKDIR /usr/src/app
-
-# Copia os arquivos de pacotes e instala TODAS as dependências.
+RUN apk add --no-cache --virtual .builds-deps build-base python3 curl openssl-dev
 COPY package*.json ./
 RUN npm install
-
-# Copia o resto do código.
 COPY . .
-
-# Garante que o Prisma Client seja gerado e constrói a aplicação.
 RUN npx prisma generate
 RUN npm run build
 
-# Este estágio começa com uma imagem limpa e só copia o necessário.
-FROM node:18-slim as runner
-
+FROM node:18-alpine as runner
 WORKDIR /usr/src/app
-
-# Copia o package.json para saber as dependências de produção.
+RUN apk add --no-cache openssl curl
 COPY package.json ./
-
-# Instala SOMENTE as dependências de produção de forma otimizada.
 RUN npm install --omit=dev --ci
-
-# Copia os artefatos construídos do estágio 'builder'.
 COPY --from=builder /usr/src/app/dist ./dist
-COPY --from=builder /usr/src/app/prisma ./prisma
+COPY --from=builder /usr/src/app/prisma/schema.prisma ./prisma/schema.prisma
+COPY --from=builder /usr/src/app/prisma/data ./prisma/data
 COPY --from=builder /usr/src/app/node_modules/.prisma ./node_modules/.prisma
-
 EXPOSE 3000
-
-# Comando final para iniciar a aplicação.
-CMD ["node", "dist/main"]
+CMD ["sh", "-c", "npx prisma migrate deploy && node dist/main"]

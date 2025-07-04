@@ -1,15 +1,15 @@
 import { Body, Controller,Delete,Get, Param, Patch, Post,ParseIntPipe } from '@nestjs/common';
-import { CreateProductService } from 'src/application/use-cases/product/create-product/create-product'
-import { FindProductAllService } from 'src/application/use-cases/product/find-product-all/find-product-all'
-import { FindProductByIdService } from 'src/application/use-cases/product/find-product-by-id/find-product-by-id'
-import { FindProductPriceService } from 'src/application/use-cases/product/find-product-price/find-product-price'
-import { DeleteProductService } from 'src/application/use-cases/product/delete-product/delete-product'
-import { UpdateProductService } from 'src/application/use-cases/product/update-product/update-product'
-import {priceDTO} from 'src/interfaces/dtos/price.DTO/price.DTO'
-import { CreateProductDto } from 'src/interfaces/dtos/create.products/create.products'
-import { UpdateProductsDTO } from 'src/interfaces/dtos/update.products/update.products'
-import { FindProductCatagoryService } from 'src/application/use-cases/product/find-product-category.id/find-product-category.id';
-import { FindAllProductCatagoryService } from 'src/application/use-cases/product/findall-categoryproducts/findall-categoryproducts';
+import { CreateProductService } from 'src/application/use-cases/product/create-product'
+import { FindProductAllService } from 'src/application/use-cases/product/find-product-all'
+import { FindProductByIdService } from 'src/application/use-cases/product/find-product-by-id'
+import { FindProductPriceService } from 'src/application/use-cases/product/find-product-price'
+import { DeleteProductService } from 'src/application/use-cases/product/delete-product'
+import { UpdateProductService } from 'src/application/use-cases/product/update-product'
+import {priceDTO} from 'src/interfaces/dtos/price.DTO'
+import { CreateProductDto } from 'src/interfaces/dtos/create.products'
+import { UpdateProductsDTO } from 'src/interfaces/dtos/update.products'
+import { FindProductCatagoryService } from 'src/application/use-cases/product/find-product-category.id';
+import { FindAllProductCatagoryService } from 'src/application/use-cases/product/findall-categoryproducts';
 
 @Controller('products')
 export class ProductsController {

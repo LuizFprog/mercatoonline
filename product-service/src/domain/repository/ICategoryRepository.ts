@@ -1,4 +1,4 @@
-import { CreateCategoryDto } from 'src/interfaces/dtos/create.category/create.category';
+import { CreateCategoryDto } from 'src/interfaces/dtos/create.category';
 import { Category } from '../entities/category/category.entity';
 
 export const ICategoryRepository = Symbol('ICategoryRepository');

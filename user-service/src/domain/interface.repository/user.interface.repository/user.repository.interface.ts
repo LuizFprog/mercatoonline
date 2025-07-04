@@ -4,6 +4,8 @@ export const IUserRepository = Symbol('IUserRepository');
 
 export interface IUserRepository {
   findById(id: number);
+  findByCPF(cpf: string);
+  findByPhone(phone: string);
   findByEmail(email: string);
   findAll();
   create(data: Omit<User, 'id' | 'createdAt' | 'updatedAt' | 'addresses'>);
