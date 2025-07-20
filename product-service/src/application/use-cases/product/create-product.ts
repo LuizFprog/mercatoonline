@@ -1,31 +1,38 @@
-import { Injectable, Inject } from '@nestjs/common';
+import { Inject, Injectable } from '@nestjs/common';
 import { IProductRepository } from 'src/domain/repository/IProductRepository';
+import { Product, Prisma } from '@prisma/client';
 import { CreateProductDto } from 'src/interfaces/dtos/create.products';
 import { ClientProxy } from '@nestjs/microservices';
 
 @Injectable()
-export class CreateProductService {
-    constructor(
-        @Inject(IProductRepository)
-        private readonly productRepository: IProductRepository,
-        @Inject('NATS_SERVICE')
-        private readonly natsClient: ClientProxy,
-    ) {}
+export class CreateProductUseCase {
+  constructor(
+    @Inject(IProductRepository)
+    private readonly productRepository: IProductRepository,
+    @Inject('NATS_SERVICE')
+    private readonly natsClient: ClientProxy,
+  ) {}
 
-    // Adicionado async/await
-    async execute(data: CreateProductDto) {
-        if (!data.name || !data.price || !data.categoryId) {
-            throw new Error('Nome, preço e ID da categoria são obrigatórios.');
-        }
-        
-        // 1. Espera a criação do produto no banco
-        const newProduct = await this.productRepository.create(data);
+  async execute(data: CreateProductDto): Promise<Product> {
+    const createInput: Prisma.ProductCreateInput = {
+      name: data.name,
+      price: data.price,
+      image: data.image,
+      brand: data.brand,
+      description: data.description,
+      storeId: data.storeId,
+      batch: data.batch,
+      validity: data.validity,
+      category: {
+        connect: {
+          id: data.categoryId,
+        },
+      },
+    };
 
-        // 2. Publica o evento após o sucesso da criação
-        this.natsClient.emit('product.created', newProduct);
-        console.log(`[Product-Service] Evento 'product.created' publicado para o produto: ${newProduct.name}`);
-
-        // 3. Retorna o produto criado
-        return newProduct;
-    }
+    this.natsClient.emit('product.created', createInput);
+    console.log(`[Product-Service] Evento 'product.created' publicado novo produto. Nome: ${createInput.name}`);
+    
+    return this.productRepository.create(createInput);
+  }
 }

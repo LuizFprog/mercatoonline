@@ -1,4 +1,5 @@
 import { Module } from '@nestjs/common';
+import { ClientsModule, Transport } from '@nestjs/microservices'; // 1. Importações adicionais
 import { UsersController } from 'src/interfaces/controllers/users/users.controller';
 import { CreateUser } from 'src/application/use-cases/create-user';
 import { FindUserById } from 'src/application/use-cases/find-user-by-id';
@@ -9,13 +10,22 @@ import { FindUserAll } from 'src/application/use-cases/find.all.user';
 import { FindByCPF } from 'src/application/use-cases/find.by.cpf';
 import { FindByPhone } from 'src/application/use-cases/find.by.phone';
 import { DatabaseModule } from 'src/infrastructure/database/database.module';
-import { NatsClientModule } from 'src/infrastructure/messaging/nats-client.module'; 
-
+// Não vamos mais importar o NatsClientModule aqui
 
 @Module({
   imports: [
-    DatabaseModule,   // Fornece os repositórios (IUserRepository)
-    NatsClientModule,   // Fornece o cliente NATS (NATS_SERVICE)
+    DatabaseModule, // Fornece o IUserRepository
+
+    ClientsModule.register([
+      {
+        name: 'NATS_SERVICE',
+        transport: Transport.NATS,
+        options: {
+          // O nome do serviço no docker-compose é 'nats_server'
+          servers: ['nats://nats_server:4222'],
+        },
+      },
+    ]),
   ],
   controllers: [UsersController],
   providers: [
@@ -30,3 +40,4 @@ import { NatsClientModule } from 'src/infrastructure/messaging/nats-client.modul
   ],
 })
 export class UsersModule {}
+

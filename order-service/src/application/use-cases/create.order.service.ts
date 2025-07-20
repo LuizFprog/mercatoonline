@@ -5,14 +5,16 @@ import { HttpService } from '@nestjs/axios';
 import { firstValueFrom } from 'rxjs';
 import { AxiosError } from 'axios';
 import { ClientProxy } from '@nestjs/microservices';
+import { Prisma } from '@prisma/client';
 
 @Injectable()
-export class CreateOrderService {
+export class CreateOrderUseCase {
     private readonly userServiceUrl = 'http://user-service:3000/users';
     private readonly productServiceUrl = 'http://product-service:3000/products';
+    //private readonly paymentServiceUrl = 'http://payment-service:3000/payments';
 
     constructor(
-        @Inject('IOrderRepository') 
+        @Inject(IOrderRepository) 
         private readonly orderRepository: IOrderRepository,
         private readonly httpService: HttpService,
         @Inject('NATS_SERVICE')
@@ -28,26 +30,32 @@ export class CreateOrderService {
 
         await this.findUserById(userId);
 
-        let finalPrice = 0;
-        const productsToCreate: { productId: number; amount: number; price: number }[] = [];
+        //const { paymentstatus } = await firstValueFrom(this.httpService.get(`${this.paymentServiceUrl}/${userId}`));
+
+        /**if (!paymentstatus.ok) throw new Error('Erro!')*/
+
+        const productsToCreate: Prisma.OrderProductCreateWithoutOrderInput[] = [];
 
         for (const orderProduct of orderProducts) {
             const product = await this.findProductById(orderProduct.productId);
-            finalPrice += product.price * orderProduct.amount;
             productsToCreate.push({
                 productId: product.id,
                 amount: orderProduct.amount,
                 price: product.price,
+                total: product.price * orderProduct.amount,
             });
         }
         
-         const createnewOrderDto: CreateOrderDto = {
-             userId,
-             addressId,
-             paymentId,
-             orderProducts: productsToCreate
-            };
-        const newOrder = await this.orderRepository.create(createnewOrderDto);
+        const createOrderInput: Prisma.OrderCreateInput = {
+            userId,
+            addressId,
+            paymentId, //paymentstatus atualiza!
+            orderProducts: {
+                create: productsToCreate,
+            },
+        };
+        
+        const newOrder = await this.orderRepository.create(createOrderInput);
         
         this.natsClient.emit('order.created', newOrder);
         console.log(`[Order-Service] Evento 'order.created' publicado para o pedido ID: ${newOrder.id}`);
@@ -55,7 +63,7 @@ export class CreateOrderService {
         return newOrder;
     }
 
-    private async findUserById(id: number) {
+      private async findUserById(id: number): Promise<any> {
         try {
             const { data } = await firstValueFrom(this.httpService.get(`${this.userServiceUrl}/${id}`));
             return data;
@@ -67,7 +75,7 @@ export class CreateOrderService {
         }
     }
 
-    private async findProductById(id: number) {
+    private async findProductById(id: number): Promise<any> {
         try {
             const { data } = await firstValueFrom(this.httpService.get(`${this.productServiceUrl}/${id}`));
             return data;

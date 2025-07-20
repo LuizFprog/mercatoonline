@@ -45,7 +45,7 @@ http://localhost:4001/users
     "cityId": 2611606
   }
 }
-
+x
 Atualizar usuário:
 http://localhost:4001/users/5
 {

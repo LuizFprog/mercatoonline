@@ -6,17 +6,12 @@ import { BaseGatewayController } from '../base.gateway.controller';
 @Controller('orders')
 export class OrdersGatewayController extends BaseGatewayController {
   constructor(httpService: HttpService) {
-    super(httpService, 'order-service', 'http://order-service:3000/order');
+    super(httpService, 'order-service', 'http://order-service:3000/orders');
   }
 
   @Post()
   async create(@Body() createDto: any, @Res() res: Response) {
-    await this.proxyRequest({ method: 'POST', res, data: createDto });
-  }
-
-  @Get()
-  async findAll(@Res() res: Response) {
-    await this.proxyRequest({ method: 'GET', res });
+    await this.proxyRequest({ method: 'POST', path: '', res, data: createDto });
   }
 
   @Get(':id')

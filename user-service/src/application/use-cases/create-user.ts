@@ -24,7 +24,6 @@ export class CreateUser {
 
     const { address, password, ...userData } = data;
 
-    // 2. Validações de negócio
     const emailExists = await this.userRepository.findByEmail(userData.email);
     if (emailExists) {
       throw new ConflictException(`Usuário com o e-mail ${userData.email} já existe.`);
@@ -35,11 +34,9 @@ export class CreateUser {
       throw new ConflictException(`Usuário com o CPF ${userData.cpf} já existe.`);
     }
 
-    // 3. Transformação de dados (Hashing)
     const saltRounds = 10;
     const hashedPassword = await bcrypt.hash(password, saltRounds);
 
-    // 4. Monta o objeto de dados para o Prisma
     const createUserInput: Prisma.UserCreateInput = {
       ...userData,
       password: hashedPassword,
@@ -58,12 +55,10 @@ export class CreateUser {
       },
     };
     
-    // 5. Delega a criação para o repositório
     const newUser = await this.userRepository.create(createUserInput);
 
-    // 6. Lida com efeitos colaterais (Publicar evento)
     try {
-      //this.natsClient.emit('user.created', newUser);
+      this.natsClient.emit('user.created', newUser);
       console.log(`Evento 'user.created' publicado para o usuário: ${newUser.email}`);
     } catch (error) {
       console.error('ERRO ao publicar evento no NATS:', error);

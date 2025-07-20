@@ -1,79 +1,27 @@
-import { Injectable } from "@nestjs/common";
+import { Injectable } from '@nestjs/common';
+import { Order, Prisma } from '@prisma/client';
+import { PrismaService } from 'src/prisma/prisma.service';
 import { IOrderRepository } from 'src/domain/interface/repository/IOrder';
-import { CreateOrderDto } from 'src/interface/dtos/create-order.dto'; 
-import { PrismaService } from "src/prisma/prisma-service/prisma.service";
 
-@Injectable() 
+@Injectable()
 export class OrderPrismaRepository implements IOrderRepository {
+  constructor(private readonly prisma: PrismaService) {}
 
-    constructor(private prisma: PrismaService) {}
+  async create(data: Prisma.OrderCreateInput): Promise<Order> {
+    return this.prisma.order.create({
+      data,
+      include: { orderProducts: true }, 
+    });
+  }
 
-  async create(data: CreateOrderDto) {
-        
-    try{
-        return await this.prisma.order.create({
-            data: {
-                userId: data.userId,
-                addressId: data.addressId,
-                paymentId: data.paymentId,
-                orderProducts: {
-                    create: data.orderProducts.map(product => ({
-                        productId: product.productId,
-                        amount: product.amount,
-                        price: product.price
-                    }))
-                }
-            },
-            include: {
-                orderProducts: true,
-            }
-        });
-    }
-    catch(error){
-        throw new Error(`Error creating order: ${error.message}`);  
-    }
-    
-    }
+  async findById(id: number): Promise<Order | null> {
+    return this.prisma.order.findUnique({
+      where: { id },
+      include: { orderProducts: true },
+    });
+  }
 
-    async findall() {
-        try
-        {
-            const orders = await this.prisma.order.findMany({
-                include: {
-                    orderProducts: true, 
-                },
-            });
-            return orders
-        }
-        catch(error){
-            throw new Error(`Error fetching orders: ${error.message}`);
-        }
-    }
-
-    async findbyId(id: number) {
-        try
-        {
-            const findOrder = await this.prisma.order.findUnique({
-                where: { id:id },
-                include: {
-                    orderProducts: true, 
-                },
-            });
-            return findOrder;
-        }
-        catch(error){
-            throw new Error(`Error fetching order by id: ${error.message}`);
-        }
-    }
-
-    async delete(id: number) {
-        try{          
-            return this.prisma.order.delete({
-                where: { id },
-            });
-        }
-        catch(error){
-            throw new Error(`Error deleting order: ${error.message}`);
-        }
-    }
+  async delete(id: number): Promise<Order> {
+    return this.prisma.order.delete({ where: { id } });
+  }
 }

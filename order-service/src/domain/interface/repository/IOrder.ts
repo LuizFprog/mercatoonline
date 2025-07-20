@@ -1,10 +1,9 @@
-import { CreateOrderDto } from 'src/interface/dtos/create-order.dto'
+import { Order, Prisma } from '@prisma/client';
 
-export const IOrderRepositoryService = Symbol('IOrderProductService');
+export const IOrderRepository = Symbol('IOrderRepository');
 
-export interface IOrderRepository{
-    create(data:CreateOrderDto);
-    delete(id:number);
-    findbyId(id:number);
-    findall();
+export interface IOrderRepository {
+  create(data: Prisma.OrderCreateInput): Promise<Order>;
+  findById(id: number): Promise<Order | null>;
+  delete(id: number): Promise<Order>;
 }

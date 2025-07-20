@@ -33,24 +33,23 @@ export class UsersController {
         return this.findUserById.execute(id);
     }
 
-    @Get(':email')
+    @Get('email/:email')
     findEmail(@Param('email') email: string) {
         return this.findByEmail.execute(email);
     }
 
-    @Get(':cpf')
+    @Get('cpf/:cpf')
     findCPF(@Param('cpf') cpf: string) {
         return this.findByCPF.execute(cpf);
     }
 
-    @Get(':phone')
+    @Get('phone/:phone')
     findPhone(@Param('phone') phone: string) {
         return this.findByPhone.execute(phone);
     }
 
     @Post()
     createUser(@Body() createUserDto: CreateUserDto) {
-         console.log(`[UsersController] Requisição POST /users recebida! Body:`, createUserDto);
         return this.createUser_.execute(createUserDto);
     }
 

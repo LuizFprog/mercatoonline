@@ -10,10 +10,20 @@ export class UpdateProductsDTO{
   @IsNotEmpty()
   name?: string;
 
+  @IsString()
+  description?: string;
+
   @IsNumber()
   @Min(0.01)
   price?: number;
-
+  
+  @IsNumber()
+  @Min(0)
+  stock_quantity?: number;
+  
+  @IsString()
+  image_url?: string;
+  
   @IsString()
   brand?: string;
 

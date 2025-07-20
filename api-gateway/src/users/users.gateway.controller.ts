@@ -24,15 +24,21 @@ export class UsersGatewayController extends BaseGatewayController {
     await this.proxyRequest({ method: 'GET', path: `/${id}`, res });
   }
   
-  @Get('/by-cpf/:cpf')
+  @Get('/cpf/:cpf')
   async findUserByCpf(@Param('cpf') cpf: string, @Res() res: Response) {
-      await this.proxyRequest({ method: 'GET', path: `/by-cpf/${cpf}`, res });
+      await this.proxyRequest({ method: 'GET', path: `/cpf/${cpf}`, res });
   }
 
-  @Get('/by-email/:email')
+  @Get('/email/:email')
   async findUserByEmail(@Param('email') email: string, @Res() res: Response) {
-      await this.proxyRequest({ method: 'GET', path: `/by-email/${email}`, res });
+      await this.proxyRequest({ method: 'GET', path: `/email/${email}`, res });
   }
+
+  @Get('/phone/:phone')
+  async findUserByPhone(@Param('phone') phone: string, @Res() res: Response) {
+      await this.proxyRequest({ method: 'GET', path: `/phone/${phone}`, res });
+  }
+
 
   @Patch('/:id')
   async updateUser(@Param('id') id: string, @Body() updateDto: any, @Res() res: Response) {

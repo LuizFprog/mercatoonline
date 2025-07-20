@@ -21,6 +21,10 @@ export class UpdateProductService {
         if(!idExists){
             throw new Error(`Product with ID ${id} not found`);
         }   
+
+        this.natsClient.emit('product.updated', idExists);
+        console.log(`[Product-Service] Evento 'product.updated' publicado atualizado produto. Name: ${idExists.name}`);
+        
         return await this.productPrisma.update(id,data)
     }
 }

@@ -7,7 +7,7 @@ import { UpdateUserDto } from 'src/interfaces/dto/update.user.dto/update.user.td
 
 @Injectable()
 export class UserPrismaRepository implements IUserRepository {
-  // Objeto 'select' para garantir que a senha NUNCA seja retornada
+  
   private readonly userSelect = {
     id: true,
     name: true,
@@ -30,8 +30,6 @@ export class UserPrismaRepository implements IUserRepository {
 
   constructor(private readonly prisma: PrismaService) {}
 
-  // CORRIGIDO: Métodos 'find' agora retornam o resultado diretamente.
-  // A lógica de "não encontrado" (if !user) pertence ao Caso de Uso.
   async findById(id: number) {
     return this.prisma.user.findUnique({
       where: { id },
@@ -47,18 +45,14 @@ export class UserPrismaRepository implements IUserRepository {
   }
 
   async findByEmail(email: string) {
-    // Retorna o usuário com a senha, pois pode ser usado para login.
-    // O Caso de Uso será responsável por não expor a senha.
     return this.prisma.user.findUnique({
       where: { email },
     });
   }
   
   async findByPhone(phone: string) {
-    // findFirst é mais apropriado se múltiplos usuários puderem ter o mesmo telefone.
-    return this.prisma.user.findFirst({
+    return this.prisma.user.findUnique({
       where: { phone },
-      select: this.userSelect,
     });
   }
 
@@ -68,7 +62,6 @@ export class UserPrismaRepository implements IUserRepository {
     });
   }
 
-  // CORRIGIDO: O método 'create' agora só recebe os dados prontos e os cria.
   async create(data: Prisma.UserCreateInput) {
     return this.prisma.user.create({
       data,

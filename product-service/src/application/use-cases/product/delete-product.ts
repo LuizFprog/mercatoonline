@@ -18,6 +18,9 @@ export class DeleteProductService {
         if(!product){
             throw new Error(`Product with ID ${id} not found`);
         }   
+
+        this.natsClient.emit('product.deleted', product);
+        console.log(`[Product-Service] Evento 'product.deleted' publicado deletado produto. Name: ${product.name}`);
         await this.productPrisma.delete(id);
     };
 }

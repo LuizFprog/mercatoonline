@@ -1,6 +1,6 @@
 generator client {
   provider = "prisma-client-js"
-  binaryTargets = ["native", "debian-openssl-1.1.x"]
+  binaryTargets = ["native", "linux-musl-openssl-3.0.x"]
 }
 
 datasource db {
@@ -40,12 +40,12 @@ model Address {
 }
 
 model City {
-  id        Int      @id
+  id        Int       @id
   name      String
-  createdAt DateTime @default(now()) @map("created_at")
-  updatedAt DateTime @updatedAt @map("updated_at")
-  state     State    @relation(fields: [stateId], references: [id])
-  stateId   Int      @map("state_id")
+  createdAt DateTime  @default(now()) @map("created_at")
+  updatedAt DateTime  @updatedAt @map("updated_at")
+  state     State     @relation(fields: [stateId], references: [id])
+  stateId   Int       @map("state_id")
   addresses Address[]
 
   @@map("cities")

@@ -1,5 +1,3 @@
-version: '3.8'
-
 services:
   # ===================================================================
   # 1. INFRAESTRUTURA
@@ -31,7 +29,6 @@ services:
       interval: 10s
       timeout: 5s
       retries: 5
-      start_period: 10s
 
   product_db:
     image: postgres:15-alpine
@@ -51,7 +48,25 @@ services:
       interval: 10s
       timeout: 5s
       retries: 5
-      start_period: 10s
+
+  store_db:
+    image: postgres:15-alpine
+    container_name: store_service_db
+    environment:
+      POSTGRES_USER: docker
+      POSTGRES_PASSWORD: docker
+      POSTGRES_DB: store_db
+    ports:
+      - "5437:5432"
+    volumes:
+      - store_pgdata:/var/lib/postgresql/data
+    networks:
+      - mercato_network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U docker -d store_db"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
 
   order_db:
     image: postgres:15-alpine
@@ -71,7 +86,25 @@ services:
       interval: 10s
       timeout: 5s
       retries: 5
-      start_period: 10s
+  
+  cart_db:
+    image: postgres:15-alpine
+    container_name: cart_service_db
+    environment:
+      POSTGRES_USER: docker
+      POSTGRES_PASSWORD: docker
+      POSTGRES_DB: cart_db # Nome do banco de dados
+    ports:
+      - "5438:5432" # Expõe a porta 5438 na sua máquina
+    volumes:
+      - cart_pgdata:/var/lib/postgresql/data
+    networks:
+      - mercato_network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U docker -d cart_db"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
 
   # ===================================================================
   # 2. MICROSSERVIÇOS
@@ -82,7 +115,7 @@ services:
     container_name: user_service_app
     environment:
       DATABASE_URL: "postgresql://docker:docker@user_db:5432/user_db?schema=public"
-    command: sh -c "npx prisma migrate deploy && node dist/main"
+    command: sh -c "npx prisma migrate reset --force && node dist/main"
     depends_on:
       user_db:
         condition: service_healthy
@@ -103,9 +136,32 @@ services:
     container_name: product_service_app
     environment:
       DATABASE_URL: "postgresql://docker:docker@product_db:5432/product_db?schema=public"
-    command: sh -c "npx prisma migrate deploy && node dist/main"
+    command: sh -c "npx prisma migrate reset --force --skip-seed && node dist/main"
     depends_on:
       product_db:
+        condition: service_healthy
+      nats:
+        condition: service_started
+    networks:
+      - mercato_network
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:3000/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
+
+  store-service:
+    build:
+      context: ./store-service
+    container_name: store_service_app
+    environment:
+      DATABASE_URL: "postgresql://docker:docker@store_db:5432/store_db?schema=public"
+      JWT_SECRET: "SEU_SEGREDO_SUPER_SECRETO_AQUI"
+    # Este comando força a recriação do banco a partir do zero
+    command: sh -c "npx prisma migrate reset --force --skip-seed && node dist/main"
+    depends_on:
+      store_db:
         condition: service_healthy
       nats:
         condition: service_started
@@ -124,17 +180,35 @@ services:
     container_name: order_service_app
     environment:
       DATABASE_URL: "postgresql://docker:docker@order_db:5432/order_db?schema=public"
-    command: sh -c "npx prisma migrate deploy && node dist/main"
+    command: sh -c "npx prisma migrate reset --force --skip-seed && node dist/main"
     depends_on:
       order_db:
         condition: service_healthy
-      nats:
-        condition: service_started
-      # Importante: Depende dos outros serviços para validação
       user-service:
         condition: service_healthy
       product-service:
         condition: service_healthy
+    networks:
+      - mercato_network
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:3000/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
+
+  cart-service:
+    build:
+      context: ./cart-service
+    container_name: cart_service_app
+    environment:
+      DATABASE_URL: "postgresql://docker:docker@cart_db:5432/cart_db?schema=public"
+    command: sh -c "npx prisma migrate reset --force --skip-seed && node dist/main"
+    depends_on:
+      cart_db:
+        condition: service_healthy
+      nats:
+        condition: service_started
     networks:
       - mercato_network
     healthcheck:
@@ -168,7 +242,11 @@ services:
         condition: service_healthy
       product-service:
         condition: service_healthy
+      store-service:
+        condition: service_healthy
       order-service:
+        condition: service_healthy
+      cart-service:
         condition: service_healthy
     networks:
       - mercato_network
@@ -180,6 +258,8 @@ volumes:
   user_pgdata:
   product_pgdata:
   order_pgdata:
+  store_pgdata:
+  cart_pgdata:
 
 networks:
   mercato_network:

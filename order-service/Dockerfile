@@ -1,22 +1,27 @@
-FROM node:18-alpine AS builder
+# --- ESTÁGIO 1: BUILDER ---
+FROM node:20-alpine as builder
+RUN apk add --no-cache --virtual .builds-deps build-base python3 curl openssl-dev
 WORKDIR /usr/src/app
 COPY package*.json ./
 RUN npm install
 COPY . .
+RUN npx prisma generate
 RUN npm run build
 
-# STAGE 2: production
-FROM node:18-alpine
-WORKDIR /usr/src/app
-
+# --- ESTÁGIO 2: RUNNER (A ETAPA CORRIGIDA) ---
+FROM node:20-alpine as runner
 RUN apk add --no-cache openssl curl
+WORKDIR /usr/src/app
+COPY package.json ./
+RUN npm install --omit=dev --ci
 
-COPY package*.json ./
-RUN npm install --only=production
-
+# Copia os ficheiros da aplicação já compilados
 COPY --from=builder /usr/src/app/dist ./dist
-COPY prisma ./prisma
-RUN npx prisma generate
+
+# Copia o schema do Prisma e os ficheiros de migração
+COPY --from=builder /usr/src/app/prisma ./prisma
+COPY --from=builder /usr/src/app/node_modules/.prisma ./node_modules/.prisma
+COPY --from=builder /usr/src/app/node_modules/@prisma/client ./node_modules/@prisma/client
 
 EXPOSE 3000
-CMD ["sh", "-c", "npx prisma migrate deploy && node dist/main"]
+CMD ["node", "dist/main"]

@@ -15,7 +15,6 @@ export class FindByCPF {
     if (!user) {  
       throw new Error(`User with CPF ${cpf} not found`);
     }
-    // Verifica se o usuário existe
     return await this.userRepository.findByCPF(cpf);
   }
 }

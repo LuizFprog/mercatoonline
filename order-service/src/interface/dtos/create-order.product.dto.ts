@@ -14,4 +14,9 @@ export class OrderProductDto {
   @IsNotEmpty()
   @Min(0.01)
   price: number;
+
+  @IsNumber()
+  @IsNotEmpty()
+  @Min(0.01)
+  total: number;
 }

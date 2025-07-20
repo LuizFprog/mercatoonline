@@ -1,40 +1,29 @@
-import { Controller,Get, Param,Post,Body,Delete,ParseIntPipe } from '@nestjs/common';
-import { CreateOrderService } from 'src/application/use-cases/create.order.service'
-import { DeleteOrderService } from 'src/application/use-cases/delete.order.service'
-import { FindallorderService } from 'src/application/use-cases/findallorder.service'
-import { FindbyidOrderProductService } from 'src/application/use-cases/findbyid.order-product.service'
-import { CreateOrderDto } from 'src/interface/dtos/create-order.dto';
+import { Controller, Post, Get, Delete, Body, Param, ParseIntPipe } from '@nestjs/common';
+import { CreateOrderUseCase } from 'src/application/use-cases/create.order.service';
+import { FindOrderByIdUseCase } from 'src/application/use-cases/findbyid.order-product.service';
+import { DeleteOrderByIdUseCase } from 'src/application/use-cases/delete.order.service';
+import { CreateOrderDto } from '../dtos/create-order.dto';
 
-
-@Controller('order')
+@Controller('orders')
 export class OrderController {
+  constructor(
+    private readonly createOrderUseCase: CreateOrderUseCase,
+    private readonly findOrderByIdUseCase: FindOrderByIdUseCase,
+    private readonly deleteOrderByIdUseCase: DeleteOrderByIdUseCase,
+  ) {}
 
-    constructor(
-        private readonly createOrderService: CreateOrderService,
-        private readonly deleteOrderService: DeleteOrderService,
-        private readonly findallorderService: FindallorderService,
-        private readonly findbyidOrderProductService: FindbyidOrderProductService
-    ){}
+  @Post()
+  create(@Body() createOrderDto: CreateOrderDto) {
+    return this.createOrderUseCase.execute(createOrderDto);
+  }
 
+  @Get(':id')
+  findById(@Param('id', ParseIntPipe) id: number) {
+    return this.findOrderByIdUseCase.execute(id);
+  }
 
-    @Get(':id')
-    findById(@Param("id", ParseIntPipe) id:number){
-        return this.findbyidOrderProductService.execute(id);
-    }
-
-    @Get()
-    findAll(){
-        return this.findallorderService.execute();
-    }
-    
-    @Post()
-    createOrder(@Body() createorderdto:CreateOrderDto){
-        return this.createOrderService.execute(createorderdto);
-    }
-
-    @Delete(":id")
-    DeleteOrder(@Param("id", ParseIntPipe) id: number){
-        return this.deleteOrderService.execute(id);
-
-    }
+  @Delete(':id')
+  delete(@Param('id', ParseIntPipe) id: number) {
+    return this.deleteOrderByIdUseCase.execute(id);
+  }
 }

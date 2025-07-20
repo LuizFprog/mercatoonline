@@ -1,19 +1,19 @@
-import { Injectable, Inject, NotFoundException } from '@nestjs/common';
+import { Inject, Injectable, NotFoundException } from '@nestjs/common';
 import { IOrderRepository } from 'src/domain/interface/repository/IOrder';
 
 @Injectable()
-export class DeleteOrderService {
-    constructor(
-        @Inject('IOrderRepository') 
-        private readonly orderRepository: IOrderRepository) {}
+export class DeleteOrderByIdUseCase {
+  constructor(
+    @Inject(IOrderRepository) private readonly orderRepository: IOrderRepository,
+  ) {}
 
-    async execute(orderId: number) {
-        // Primeiro, verifica se o pedido existe
-        const orderExists = await this.orderRepository.findbyId(orderId);
-        if (!orderExists) {
-            throw new NotFoundException(`Pedido com ID ${orderId} não encontrado para deletar.`);
-        }
-        // Se existe, deleta
-        await this.orderRepository.delete(orderId);
+  async execute(id: number): Promise<{ message: string }> {
+    // CORREÇÃO: Usa 'findById' com 'B' maiúsculo
+    const orderExists = await this.orderRepository.findById(id);
+    if (!orderExists) {
+      throw new NotFoundException(`Pedido com ID ${id} não encontrado.`);
     }
+    await this.orderRepository.delete(id);
+    return { message: 'Pedido deletado com êxito' };
+  }
 }

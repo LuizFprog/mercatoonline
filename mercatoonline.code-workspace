@@ -1,0 +1,14 @@
+{
+    "folders": [
+        { "name": "API Gateway", "path": "api-gateway" },
+        { "name": "Cart Service", "path": "cart-service" },
+        { "name": "Notification Service", "path": "notification-service" },
+        { "name": "Order Service", "path": "order-service" },
+        { "name": "Product Service", "path": "product-service" },
+        { "name": "Store Service", "path": "store-service" },
+        { "name": "User Service", "path": "user-service" }
+    ],
+    "settings": {
+        "typescript.tsdk": "node_modules/typescript/lib"
+    }
+}

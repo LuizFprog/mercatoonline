@@ -1,8 +1,8 @@
 import { Module } from '@nestjs/common';
-import { CartPrismaRepositoryService } from './repositories/cart-prisma.repository/cart-prisma.repository.service';
+import { CartPrismaRepository } from './repositories/cart-prisma.repository.service';
 
 
 @Module({
-  providers: [CartPrismaRepositoryService]
+  providers: [CartPrismaRepository]
 })
 export class DatabaseModule {}

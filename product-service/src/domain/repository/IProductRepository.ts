@@ -1,15 +1,14 @@
-import { Product } from '../entities/products/product.entity'; 
-import { priceDTO } from 'src/interfaces/dtos/price.DTO'
+import { Product, Prisma } from '@prisma/client';
+import { PriceRangeDto } from 'src/interfaces/dtos/price.DTO'
 
 export const IProductRepository = Symbol('IProductRepository');
 
 export interface IProductRepository{
-    findById(id:number);
-    findAll();
-    findByPriceRange(data:Partial<priceDTO>)
-    findByCategoryId(id:number);
-    findAllCategory();
-    create(data:Omit<Product,'id'|'createdAt'|'updatedAt'>)
-    update(id:number,data:Partial<Product>)
+    findById(id: number): Promise<Product | null>;
+    findAll(): Promise<Product[]>;
+    findByCategoryId(id: number): Promise<Product[]>;
+    create(data: Prisma.ProductCreateInput): Promise<Product>;
+    update(id: number, data: Prisma.ProductUpdateInput): Promise<Product>;
     delete(id:number);
+    findByPriceRange(data:Partial<PriceRangeDto>)
 }

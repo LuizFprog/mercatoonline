@@ -5,7 +5,7 @@ export class OrderProduct {
   orderId: number;
   productId: number;
   amount: number;
-  price: number; // Preço do produto no momento da compra
+  price: number; 
   createdAt: Date;
   updatedAt: Date;
   order: Order;

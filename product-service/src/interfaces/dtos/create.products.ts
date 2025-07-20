@@ -1,29 +1,39 @@
-import { IsString, IsNotEmpty, IsNumber, Min, IsUrl, IsInt } from 'class-validator';
-import { CreateCategoryDto } from 'src/interfaces/dtos/create.category'
+import { IsString, IsNotEmpty, IsInt, IsNumber } from 'class-validator';
 
 export class CreateProductDto {
-  @IsInt()
-  @IsNotEmpty()
-  categoryId: number;
-
   @IsString()
   @IsNotEmpty()
   name: string;
 
   @IsNumber()
-  @Min(0.01)
+  @IsNotEmpty()
   price: number;
-  
-  @IsString()
-  brand?: string;
 
   @IsString()
-  batch?:string;
-
-  @IsString()
-  validity?: string;
-
-  @IsUrl()
   @IsNotEmpty()
   image: string;
+
+  @IsString()
+  @IsNotEmpty()
+  brand: string;
+
+  @IsString()
+  @IsNotEmpty()
+  description: string;
+
+  @IsInt()
+  @IsNotEmpty()
+  storeId: number;
+
+  @IsString()
+  @IsNotEmpty()
+  batch: string;
+
+  @IsString()
+  @IsNotEmpty()
+  validity: string;
+
+  @IsInt()
+  @IsNotEmpty()
+  categoryId: number;
 }

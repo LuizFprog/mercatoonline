@@ -6,6 +6,9 @@ export class Product {
   price: number;
   brand?: string; 
   batch?: string;
+  store_id: number;
+  stock_quantity: number;
+  description?:string;
   validity?: string;
   image: string;
   createdAt: Date; 

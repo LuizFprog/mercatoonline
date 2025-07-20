@@ -1,7 +1,15 @@
-// order-service/src/interfaces/order/dto/create-order.dto.ts
 import { Type } from 'class-transformer';
-import { IsInt, IsNotEmpty, IsArray, ValidateNested, Min, IsNumber } from 'class-validator';
-import { OrderProductDto } from './create-order.product.dto'
+import { IsArray, IsInt, IsNotEmpty, ValidateNested } from 'class-validator';
+
+class OrderProductDto {
+  @IsInt()
+  @IsNotEmpty()
+  productId: number;
+
+  @IsInt()
+  @IsNotEmpty()
+  amount: number;
+}
 
 export class CreateOrderDto {
   @IsInt()
@@ -13,7 +21,8 @@ export class CreateOrderDto {
   addressId: number;
 
   @IsInt()
-  paymentId?: number;
+  @IsNotEmpty()
+  paymentId: number;
 
   @IsArray()
   @ValidateNested({ each: true })

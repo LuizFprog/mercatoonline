@@ -1,18 +1,19 @@
-import { Module } from '@nestjs/common';
+import { Global, Module } from '@nestjs/common';
 import { ClientsModule, Transport } from '@nestjs/microservices';
 
+@Global() 
 @Module({
   imports: [
     ClientsModule.register([
       {
-        name: 'NATS_SERVICE', // O token que usamos para injetar o cliente
+        name: 'NATS_SERVICE',
         transport: Transport.NATS,
         options: {
-          servers: ['nats://nats:4222'], // O endereço do container NATS na rede Docker
+          servers: ['nats://nats_server:4222'], 
         },
       },
     ]),
   ],
-  exports: [ClientsModule], // ESSENCIAL: Exporta o cliente para outros módulos
+  exports: [ClientsModule], 
 })
 export class NatsClientModule {}

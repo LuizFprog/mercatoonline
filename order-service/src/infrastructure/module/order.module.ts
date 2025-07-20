@@ -1,29 +1,37 @@
 import { Module } from '@nestjs/common';
-import { HttpModule } from '@nestjs/axios'; // Importado aqui
-import { CreateOrderService } from 'src/application/use-cases/create.order.service';
-import { DeleteOrderService } from 'src/application/use-cases/delete.order.service';
-import { FindallorderService } from 'src/application/use-cases/findallorder.service';
-import { FindbyidOrderProductService } from 'src/application/use-cases/findbyid.order-product.service';
+import { HttpModule } from '@nestjs/axios';
+import { ClientsModule, Transport } from '@nestjs/microservices';
+import { CreateOrderUseCase } from 'src/application/use-cases/create.order.service';
+import { DeleteOrderByIdUseCase } from 'src/application/use-cases/delete.order.service';
+import { FindOrderByIdUseCase } from 'src/application/use-cases/findbyid.order-product.service';
 import { IOrderRepository } from 'src/domain/interface/repository/IOrder';
 import { OrderPrismaRepository } from '../database/repository/order.prisma.repository';
-import { PrismaModule } from '../../prisma/prisma-module/prisma.module';
+import { PrismaModule } from '../../prisma/prisma.module';
 import { OrderController } from 'src/interface/controller/order.controller';
 
 @Module({
     imports: [
-        PrismaModule,
-        HttpModule, // Adicionado para permitir a comunicação HTTP
-    ],
+    PrismaModule,
+    HttpModule,
+    ClientsModule.register([
+      {
+        name: 'NATS_SERVICE',
+        transport: Transport.NATS,
+        options: {
+          servers: ['nats://nats_server:4222'],
+        },
+      },
+    ]),
+  ],
     controllers: [OrderController],
     providers: [
         {
-            provide: 'IOrderRepository', // Use a string token for the interface
+            provide: IOrderRepository,
             useClass: OrderPrismaRepository,
         },
-        CreateOrderService,
-        DeleteOrderService,
-        FindallorderService,
-        FindbyidOrderProductService,
+        CreateOrderUseCase,
+        DeleteOrderByIdUseCase,
+        FindOrderByIdUseCase,
     ],
 })
 export class OrderModule {}

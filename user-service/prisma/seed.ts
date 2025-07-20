@@ -1,74 +1,50 @@
-// prisma/seed.ts
-
 import { PrismaClient } from '@prisma/client';
 import * as fs from 'fs';
 import * as path from 'path';
-import csv = require('csv-parser');
+import csv from 'csv-parser';
 
 const prisma = new PrismaClient();
 
-// Função genérica para ler um arquivo CSV e retornar os dados como um array
 async function readCSV<T>(filePath: string): Promise<T[]> {
+  if (!fs.existsSync(filePath)) {
+    throw new Error(`Arquivo não encontrado no caminho: ${filePath}`);
+  }
   return new Promise((resolve, reject) => {
     const results: T[] = [];
-    fs.createReadStream(filePath)
-      .pipe(csv())
-      .on('data', (data) => results.push(data))
-      .on('end', () => resolve(results))
-      .on('error', (error) => reject(error));
+    fs.createReadStream(filePath).pipe(csv()).on('data', (data) => results.push(data)).on('end', () => resolve(results)).on('error', (error) => reject(error));
   });
 }
 
 async function main() {
-  console.log(`Iniciando o povoamento (seeding)...`);
+  console.log(`Iniciando o povoamento (seeding) para user-service...`);
+  const dataPath = path.join(process.cwd(), 'prisma', 'data');
 
-  // --- 1. Povoar Estados ---
-  console.log('Populando a tabela de Estados...');
-  const statesPath = path.join(__dirname, 'data', 'estados.csv');
-  const statesData = await readCSV<{ COD: string; NOME: string; SIGLA: string }>(statesPath);
+  try {
+    console.log('--- Processando Estados ---');
+    const statesPath = path.join(dataPath, 'estados.csv');
+    const statesData = await readCSV<{ COD: string; NOME: string; SIGLA: string }>(statesPath);
+    if (statesData.length > 0) {
+      const statesToCreate = statesData.map((state) => ({ id: parseInt(state.COD, 10), name: state.NOME, uf: state.SIGLA }));
+      const result = await prisma.state.createMany({ data: statesToCreate, skipDuplicates: true });
+      console.log(`${result.count} estados foram inseridos.`);
+    }
+  } catch (error) { console.error('ERRO ao processar os estados:', error); throw error; }
 
-  const statesToCreate = statesData.map((state) => ({
-    id: parseInt(state.COD, 10), // Usa o COD do CSV como ID
-    name: state.NOME,
-    uf: state.SIGLA,
-  }));
+  try {
+    console.log('\n--- Processando Cidades ---');
+    const citiesPath = path.join(dataPath, 'cidades.csv');
+    const citiesData = await readCSV<{ 'COD UF': string; COD: string; NOME: string }>(citiesPath);
+    if (citiesData.length > 0) {
+      const citiesToCreate = citiesData.map((city) => ({ id: parseInt(city.COD, 10), name: city.NOME, stateId: parseInt(city['COD UF'], 10) }));
+      const result = await prisma.city.createMany({ data: citiesToCreate, skipDuplicates: true });
+      console.log(`${result.count} cidades foram inseridas.`);
+    }
+  } catch (error) { console.error('ERRO ao processar as cidades:', error); throw error; }
 
-  // Usa createMany para inserir todos de uma vez, ignorando duplicatas
-  await prisma.state.createMany({
-    data: statesToCreate,
-    skipDuplicates: true,
-  });
-  console.log(`${statesToCreate.length} estados processados.`);
-
-
-  // --- 2. Povoar Cidades ---
-  console.log('Populando a tabela de Cidades...');
-  const citiesPath = path.join(__dirname, 'data', 'municipios.csv');
-  // Nota: o nome da coluna no CSV é "COD UF" com espaço
-  const citiesData = await readCSV<{ 'COD UF': string; COD: string; NOME: string }>(citiesPath);
-
-  const citiesToCreate = citiesData.map((city) => ({
-    id: parseInt(city.COD, 10), // Usa o COD do CSV como ID 
-    name: city.NOME,
-    stateId: parseInt(city['COD UF'], 10), // Link para o ID do estado
-  }));
-
-  await prisma.city.createMany({
-    data: citiesToCreate,
-    skipDuplicates: true,
-  });
-  console.log(`${citiesToCreate.length} cidades processadas.`);
-
-
-  console.log(`Povoamento (seeding) finalizado com sucesso.`);
+  console.log(`\nPovoamento (seeding) do user-service finalizado com sucesso.`);
 }
 
-main()
-  .catch((e) => {
-    console.error('Ocorreu um erro durante o processo de seeding:');
-    console.error(e);
-    process.exit(1);
-  })
-  .finally(async () => {
-    await prisma.$disconnect();
-  });
+main().catch((e) => {
+  console.error('\nO processo de seeding do user-service falhou:', e);
+  process.exit(1);
+}).finally(async () => { await prisma.$disconnect(); });
