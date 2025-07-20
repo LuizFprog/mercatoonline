@@ -1,0 +1,130 @@
+Order.service
+Post http://localhost:4001/orders - criar order
+{
+  "userId": 1,
+  "addressId": 1,
+  "paymentId": 1,
+  "orderProducts": [  
+    {
+      "productId": 1, 
+      "amount": 2
+    },
+    {
+      "productId": 2, 
+      "amount": 2
+    },
+    {
+      "productId": 3, 
+      "amount": 2
+    }
+  ]
+}
+
+Get http://localhost:4001/orders/"id" - pesquisar order por id //mudar para userId
+Delete http://localhost:4001/orders/"id" - deletar order...User.admin
+
+user.service
+Post http://localhost:4001/users
+{
+  "name": "Usuário Final de Teste",
+  "email": "sucess@email.com",
+  "cpf": "98765432101",
+  "typeUser": 1,
+  "phone": "81123456789",
+  "password": "umaSenhaSuperSegura123!",
+  "address": {
+    "street": "Avenida Boa Viagem",
+    "number": 2024,
+    "complement": "Apto 101",
+    "cep": "51020-000",
+    "cityId": 2611606
+  }
+}
+
+Get http://localhost:4001/users/"id" pesquisar usuário por id
+Get http://localhost:4001/users/"cpf" pesquisar usuário por cpf
+Get http://localhost:4001/users/"email" pesquisar usuário por email
+Get http://localhost:4001/users/"phone" pesquisar usuário por phone
+Get http://localhost:4001/users/ - listar todos os usuários - User.admin
+Patch http://localhost:4001/users/"id" - atualizar perfil do usuário
+Delete http://localhost:4001/users/"id"
+
+product.service
+Post http://localhost:4001/products - criar produto
+{
+  "name": "Caneta Cinza",
+  "price": 16.50,
+  "image": "http://example.com/caneta.png",
+  "brand": "SuperBIC",
+  "description": "Caneta cinza",
+  "storeId":1,
+  "batch":"11111OAL6",
+  "validity":"15/06/2030",
+  "categoryId": 1
+}
+
+Post http://localhost:4001/categories - criar categoria
+{
+  "name": "Papelaria"
+}
+
+Get http://localhost:4001/products - listar todos os produtos
+Get http://localhost:4001/products/"id" - pesquisar produtos por id
+Get http://localhost:4001/products/"price" - pesquisar produtos por preços (de price1 até price2)
+{
+  "price1":0.50,
+  "price2":10.00
+}
+
+Patch http://localhost:4001/products/"id" - atualizar produto
+Delete http://localhost:4001/products/"id" - deletar produto - store.id e user.admim
+Get http://localhost:4001/categories/"id" - pesquisar categoria
+Get http://localhost:4001/categories - listar todas as categorias
+
+cart-service
+Post http://localhost:4001/carts/"cartId"/products - adicionar produtos ao carrinho
+{
+  "productId": 2,
+  "amount": 2
+}
+
+Post http://localhost:4001/carts - criar carrinho pesquisar cart por id //mudar para userId
+{
+  "userId": 1,
+  "addressId": 1,
+  "paymentId": 1,
+  "orderProducts": [  
+  ]
+}
+
+Get http://localhost:4001/carts/"id"
+Delete Get http://localhost:4001/carts/"id" deletar cart...User.admin
+
+store-servisse
+Post http://localhost:4001/stores - criar loja 
+{
+  "name": "Loja do Mercatto Online",
+  "cnpj": "12345678000199",
+  "email": "contato@mercatto.com",
+  "password": "umaSenhaForte",
+  "description": "A melhor loja de todas!",
+  "phone": "81912345678",
+  "logo_url": "http://example.com/logo.png",
+  "userId": 1,
+  "address": {
+    "street": "Avenida Caxangá",
+    "number": 2025,
+    "complement": "Bloco A",
+    "cep": "50711-000",
+    "cityId": 2611606
+  }
+}
+
+Get http://localhost:4001/stores - listar todas as lojas 
+Get http://localhost:4001/stores/"id" - pesquisar por id do produto
+Get http://localhost:4001/stores/"cnpj" - pesquisar por id do produto storeId e user.admin
+Get http://localhost:4001/stores/"email" - pesquisar por email do produto - storeId e user.admin
+Get http://localhost:4001/stores/"name" - pesquisar por nome do produto
+Patch http://localhost:4001/stores/"id" - pesquisar por id do produto storeId e user.admin
+Delete http://localhost:4001/stores/"id" - pesquisar por id do produto user.admin
+
