@@ -51,7 +51,7 @@ export class UserPrismaRepository implements IUserRepository {
   }
   
   async findByPhone(phone: string) {
-    return this.prisma.user.findUnique({
+    return this.prisma.user.findFirst({
       where: { phone },
     });
   }
