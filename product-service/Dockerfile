@@ -5,9 +5,6 @@ WORKDIR /usr/src/app
 COPY package*.json ./
 RUN npm install
 COPY . .
-# --- CORREÇÃO AQUI ---
-# Executa o script 'prisma:generate' definido no package.json.
-# Esta é a forma mais robusta de evitar erros de 'command not found'.
 RUN npm run prisma:generate
 RUN npm run build
 
