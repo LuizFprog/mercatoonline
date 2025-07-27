@@ -6,7 +6,7 @@ async function bootstrap() {
   const app = await NestFactory.create(AppModule);
 
   app.useGlobalPipes(new ValidationPipe());
-
+  app.enableCors();
   await app.listen(3000);
   console.log(`Cart service is running on: ${await app.getUrl()}`);
 }
