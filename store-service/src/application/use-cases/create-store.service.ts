@@ -3,7 +3,6 @@ import { IStoreRepository } from 'src/domain/repositories/store.repository.inter
 import { Store, Prisma } from '@prisma/client';
 import { CreateStoreDto } from 'src/interfaces/dto/create.store.dto';
 import { ClientProxy } from '@nestjs/microservices';
-import * as bcrypt from 'bcrypt';
 
 @Injectable()
 export class CreateStoreUseCase {
@@ -14,20 +13,17 @@ export class CreateStoreUseCase {
     private readonly natsClient: ClientProxy,
   ) {}
 
-  async execute(data: CreateStoreDto): Promise<Omit<Store, 'password'>> {
+  async execute(data: CreateStoreDto): Promise<Store> {
 
-    const { address, password, ...storeData } = data;
+    const { address, ...storeData } = data;
 
     const emailExists = await this.storeRepository.findByEmail(storeData.email);
     if (emailExists) {
       throw new ConflictException(`Loja com o email ${storeData.email} já existe.`);
     }
 
-    const hashedPassword = await bcrypt.hash(password, 10);
-
     const createInput: Prisma.StoreCreateInput = {
       ...storeData,
-      password: hashedPassword,
       addresses: {
         create: [address],
       },
@@ -38,7 +34,6 @@ export class CreateStoreUseCase {
     this.natsClient.emit('store.created', newStore);
     console.log(`[Store-Service] Evento 'store.created' publicado para a loja ID: ${newStore.email}`);
 
-    const { password: _, ...result } = newStore;
-    return result;
+    return newStore;
   }
 }

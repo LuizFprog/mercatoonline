@@ -1,14 +1,4 @@
-/*
-  =======================================================================
-  ARQUIVO: store-service/src/infrastructure/database/repositories/store-prisma.repository/store-prisma.repository.service.ts
-  Melhorias:
-  - Corrigida a sintaxe do objeto 'storeSelect' para relações aninhadas.
-  - Aplicado o 'storeSelect' a todos os métodos públicos para omitir a senha.
-  - O método 'findByEmail' foi tratado como um caso especial para permitir a autenticação.
-  - Corrigido o método 'delete' para corresponder à interface.
-  =======================================================================
-*/
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { Injectable} from '@nestjs/common';
 import { IStoreRepository } from 'src/domain/repositories/store.repository.interface';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { Store, Prisma } from '@prisma/client';

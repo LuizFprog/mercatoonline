@@ -14,7 +14,6 @@ model Store {
   name        String
   cnpj        String    @unique
   email       String    @unique
-  password    String
   description String?
   phone       String
   logo_url    String?

@@ -9,6 +9,6 @@ export class UpdateStoreDTO {
   @IsString() @IsOptional() description?: string;
   @IsString() @IsOptional() phone?: string;
   @IsString() @IsOptional() logo_url?: string;
-  @IsString() @IsOptional() @MinLength(6, { message: 'A senha deve ter no mínimo 6 caracteres' }) password?: string;
+
   @IsOptional() @ValidateNested()  @Type(() => CreateAddressDto) address?: CreateAddressDto;
 }
