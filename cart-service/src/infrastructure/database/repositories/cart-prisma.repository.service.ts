@@ -46,4 +46,10 @@ export class CartPrismaRepository implements ICartRepository {
       include: { cartProducts: true },
     });
   }
+
+  async findAllCart(): Promise<Cart[]> {
+    return this.prisma.cart.findMany({
+      include: { cartProducts: true },
+    });
+  }
 }

@@ -15,6 +15,7 @@ export interface AddProductData {
 export interface ICartRepository {
   create(data: Prisma.CartCreateInput): Promise<Cart>;
   findById(id: number): Promise<(Cart & { cartProducts: CartProduct[] }) | null>;
+  findAllCart(): Promise<Cart[]>;
   findByUserId(userId: number): Promise<(Cart & { cartProducts: CartProduct[] }) | null>;
   delete(id: number): Promise<Cart>;
   addProduct(data: AddProductData): Promise<Cart>;

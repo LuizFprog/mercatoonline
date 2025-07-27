@@ -19,6 +19,11 @@ export class OrdersGatewayController extends BaseGatewayController {
     await this.proxyRequest({ method: 'GET', path: `/${id}`, res });
   }
 
+  @Get()
+  async findAll(@Res() res: Response) {
+    await this.proxyRequest({ method: 'GET', path: '', res });
+  }
+
   @Delete(':id')
   async remove(@Param('id') id: string, @Res() res: Response) {
     await this.proxyRequest({ method: 'DELETE', path: `/${id}`, res });
