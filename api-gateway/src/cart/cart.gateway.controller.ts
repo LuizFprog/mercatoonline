@@ -24,6 +24,11 @@ export class CartGatewayController extends BaseGatewayController {
     await this.proxyRequest({ method: 'GET', path: `/${id}`, res });
   }
 
+  @Get()
+  async findCartAll(@Res() res: Response) {
+    await this.proxyRequest({ method: 'GET', path: '', res });
+  }
+
   @Delete(':id')
   async deleteCart(@Param('id') id: string, @Res() res: Response) {
     await this.proxyRequest({ method: 'DELETE', path: `/${id}`, res });

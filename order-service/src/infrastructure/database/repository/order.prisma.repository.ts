@@ -24,4 +24,10 @@ export class OrderPrismaRepository implements IOrderRepository {
   async delete(id: number): Promise<Order> {
     return this.prisma.order.delete({ where: { id } });
   }
+
+  async findAll(): Promise<Order[]> {
+    return this.prisma.order.findMany({
+      include: { orderProducts: true },
+    });
+  } 
 }

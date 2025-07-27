@@ -6,6 +6,7 @@ import { CartController } from 'src/interfaces/controllers/cart.controller';
 import { CreateCartUseCase } from 'src/application/use-cases/create-cart.service';
 import { DeleteCartByIdService } from 'src/application/use-cases/delete-cart.service';
 import { FindCartByIdService } from 'src/application/use-cases/find-cart-by-id.service';
+import { FindCartAllService } from 'src/application/use-cases/find-cart-all.service';
 import { AddProductToCartUseCase } from 'src/application/use-cases/add-product-to-cart.use-case';
 
 import { ICartRepository } from 'src/domain/repositories/cart.repository.interface';
@@ -31,6 +32,7 @@ import { CartPrismaRepository } from 'src/infrastructure/database/repositories/c
     DeleteCartByIdService,
     FindCartByIdService,
     AddProductToCartUseCase,
+    FindCartAllService,
     {
       provide: ICartRepository,
       useClass: CartPrismaRepository,
