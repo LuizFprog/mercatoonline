@@ -1,0 +1,40 @@
+generator client {
+  provider      = "prisma-client-js"
+  binaryTargets = ["native", "linux-musl-openssl-3.0.x"]
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Store {
+  id          Int       @id @default(autoincrement())
+  userId      Int       @map("user_id") // Mapeamento explícito
+  name        String
+  cnpj        String    @unique
+  email       String    @unique
+  description String?
+  phone       String
+  logo_url    String?
+  createdAt   DateTime  @default(now()) @map("created_at")
+  updatedAt   DateTime  @updatedAt @map("updated_at")
+  addresses   Address[]
+
+  @@map("stores")
+}
+
+model Address {
+  id          Int      @id @default(autoincrement())
+  street      String
+  number      Int
+  complement  String?
+  cep         String
+  createdAt   DateTime @default(now()) @map("created_at")
+  updatedAt   DateTime @updatedAt @map("updated_at")
+  store       Store    @relation(fields: [storeId], references: [id], onDelete: Cascade)
+  storeId     Int      @map("store_id")
+  cityId      Int      @map("city_id")
+
+  @@map("addresses")
+}

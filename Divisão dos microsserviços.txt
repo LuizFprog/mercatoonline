@@ -1,0 +1,143 @@
+Modelo de banco de dados, uma divisão lógica para um marketplace em microsserviços seria a seguinte, focada em separar responsabilidades de negócio (domínios).
+
+A arquitetura pode ser dividida em **6 microsserviços principais**:
+
+1.  **Serviço de Usuários (user-service)**
+2.  **Serviço de Lojas (store-service)**
+3.  **Serviço de Produtos (product-service)**
+4.  **Serviço de Carrinho (cart-service)**
+5.  **Serviço de Pedidos (order-service)**
+6.  **Serviço de Pagamentos (payment-service)**
+
+-----
+
+## Divisão dos Microsserviços
+
+Aqui está o detalhamento de cada serviço, suas responsabilidades, as tabelas que ele gerenciaria e a estrutura de diretórios sugerida.
+
+### 1\. Serviço de Usuários (user-service) 👤
+
+  * **Responsabilidades**: Gerenciar todas as informações relacionadas aos usuários, incluindo cadastro, autenticação, perfis e endereços. É a fonte da verdade para a identidade do usuário.
+  * **Tabelas Gerenciadas**:
+      * `user`
+      * `address`
+      * `city`
+      * `state`
+  * **Estrutura de Diretórios**:
+    ```
+    user-service/
+    └── src/
+        ├── health/
+        ├── application/
+        ├── domain/
+        └── ...
+    ```
+
+-----
+
+### 2\. Serviço de Lojas (store-service) 🏪
+
+  * **Responsabilidades**: Cuidar do cadastro e gerenciamento das lojas (vendedores). Cada loja é vinculada a um usuário (dono da loja). Também gerencia os endereços específicos das lojas.
+  * **Tabelas Gerenciadas**:
+      * `store`
+      * `address_store`
+      * `city_store`
+      * `state_store`
+  * **Estrutura de Diretórios**:
+    ```
+    store-service/
+    └── src/
+        ├── health/
+        ├── application/
+        ├── domain/
+        └── ...
+    ```
+
+-----
+
+### 3\. Serviço de Produtos (product-service) 📦
+
+  * **Responsabilidades**: Funciona como o catálogo central do marketplace. Gerencia todos os produtos, seus detalhes, preços, estoque e categorias. As lojas (store-service) publicam seus produtos aqui.
+  * **Tabelas Gerenciadas**:
+      * `product`
+      * `category`
+  * **Estrutura de Diretórios**:
+    ```
+    product-service/
+    └── src/
+        ├── health/
+        ├── application/
+        ├── domain/
+        └── ...
+    ```
+
+-----
+
+### 4\. Serviço de Carrinho (cart-service) 🛒
+
+  * **Responsabilidades**: Gerenciar os carrinhos de compra de cada usuário. É um serviço geralmente mais simples e volátil, responsável por adicionar, remover e atualizar produtos no carrinho antes da finalização da compra.
+  * **Tabelas Gerenciadas**:
+      * `cart`
+      * `cart_product`
+  * **Estrutura de Diretórios**:
+    ```
+    cart-service/
+    └── src/
+        ├── health/
+        ├── application/
+        ├── domain/
+        └── ...
+    ```
+
+-----
+
+### 5\. Serviço de Pedidos (order-service) 🚚
+
+  * **Responsabilidades**: Orquestrar todo o fluxo de um pedido após a finalização da compra. Ele cria o pedido, armazena um "snapshot" dos produtos e preços no momento da compra e gerencia o status do pedido (ex: "Aguardando Pagamento", "Enviado").
+  * **Tabelas Gerenciadas**:
+      * `order`
+      * `order_product`
+      * `order_status`
+  * **Estrutura de Diretórios**:
+    ```
+    order-service/
+    └── src/
+        ├── health/
+        ├── application/
+        ├── domain/
+        └── ...
+    ```
+
+-----
+
+### 6\. Serviço de Pagamentos (payment-service) 💳
+
+  * **Responsabilidades**: Processar e gerenciar os pagamentos. Este serviço se integra com gateways de pagamento externos, processa transações de PIX e cartão de crédito, e atualiza o status do pagamento.
+  * **Tabelas Gerenciadas**:
+      * `payment`
+      * `payment_credit_card`
+      * `payment_pix`
+      * `status` (status do pagamento, ex: "Aprovado", "Recusado")
+  * **Estrutura de Diretórios**:
+    ```
+    payment-service/
+    └── src/
+        ├── health/
+        ├── application/
+        ├── domain/
+        └── ...
+    ```
+
+-----
+
+## Comunicação e Considerações Adicionais
+
+  * **Comunicação**: Os serviços precisarão se comunicar. Por exemplo, ao fechar um pedido, o **order-service** precisará:
+
+    1.  Obter dados do **cart-service** para criar o pedido.
+    2.  Obter dados de endereço do **user-service**.
+    3.  Comunicar-se com o **payment-service** para processar o pagamento.
+    4.  Reduzir o estoque no **product-service**.
+        Essa comunicação pode ser **síncrona** (via APIs REST/gRPC) ou **assíncrona** (via eventos com um message broker como RabbitMQ ou Kafka).
+
+  * **Banco de Dados por Serviço**: O ideal na arquitetura de microsserviços é que cada serviço tenha seu próprio banco de dados isolado para garantir autonomia e desacoplamento. As tabelas que listei para cada serviço deveriam estar em bancos de dados separados.

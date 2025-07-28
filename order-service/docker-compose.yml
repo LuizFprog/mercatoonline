@@ -1,0 +1,31 @@
+services:
+  db:
+    image: postgres:15
+    container_name: order_final_db
+    restart: always
+    environment:
+      POSTGRES_USER: user
+      POSTGRES_PASSWORD: password
+      POSTGRES_DB: orderdb
+    ports:
+      - "5435:5432"
+    volumes:
+      - order_final_data:/var/lib/postgresql/data
+    healthcheck:
+      # A LINHA CORRIGIDA ESTÁ AQUI: adicionamos --dbname=orderdb
+      test: ["CMD-SHELL", "pg_isready --username=user --host=localhost --port=5432 --dbname=orderdb"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+  app:
+    build: .
+    container_name: order_final_app
+    ports:
+      - "3000:3000"
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      DATABASE_URL: "postgresql://user:password@db:5432/orderdb"
+volumes:
+  order_final_data:
