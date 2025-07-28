@@ -6,6 +6,7 @@ import { StoreGatewayModule } from './stores/stores.gateway.module';
 import { OrdersGatewayModule } from './orders/orders.gateway.module';
 import { CartGatewayModule } from './cart/cart.gateway.module';
 import { AppController } from './app.controller';
+import { LocationGatewayModule } from './users/location.gateway.module';
 
 @Module({
   imports: [
@@ -15,6 +16,7 @@ import { AppController } from './app.controller';
     OrdersGatewayModule,
     StoreGatewayModule,
     CartGatewayModule, 
+    LocationGatewayModule, 
   ],
   controllers: [AppController],
 })

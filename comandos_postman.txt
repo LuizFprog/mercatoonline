@@ -92,7 +92,6 @@ Post http://localhost:4001/carts - criar carrinho pesquisar cart por id //mudar 
 {
   "userId": 1,
   "addressId": 1,
-  "paymentId": 1,
   "orderProducts": [  
   ]
 }
