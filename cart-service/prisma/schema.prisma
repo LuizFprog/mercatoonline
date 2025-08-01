@@ -9,7 +9,7 @@ datasource db {
 
 model Cart {
   id           Int           @id @default(autoincrement())
-  userId       Int           @unique @map("user_id")
+  userId       Int           @map("user_id")
   status       String        @default("active")
   createdAt    DateTime      @default(now()) @map("created_at")
   updatedAt    DateTime      @updatedAt @map("updated_at")
@@ -21,7 +21,7 @@ model Cart {
 model CartProduct {
   id          Int      @id @default(autoincrement())
   productId   Int      @map("product_id")
-  productName String?  @map("product_name")
+  productName String?  @map("product_name") 
   amount      Int
   price       Float
   total       Float

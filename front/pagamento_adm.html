@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="pt-br" class="h-full bg-gray-100">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin - Confirmação de Pagamento</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Inter', sans-serif; }
+    </style>
+</head>
+<body class="h-full">
+    <!-- Cabeçalho -->
+    <header class="bg-white shadow-md sticky top-0 z-10">
+        <nav class="container mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center h-16">
+                <div class="flex-shrink-0">
+                    <a href="pagina_principal.html" class="text-2xl font-bold text-indigo-600">Mercatto Online - Admin</a>
+                </div>
+                <div class="flex items-center">
+                    <a href="listordem.html" class="text-sm font-medium text-gray-500 hover:text-gray-700">Ver Pedidos</a>
+                </div>
+            </div>
+        </nav>
+    </header>
+
+    <!-- Conteúdo Principal -->
+    <main class="container mx-auto max-w-lg py-12 px-4 sm:px-6 lg:px-8">
+        <div class="bg-white p-8 rounded-xl shadow-lg">
+            <div class="text-center border-b pb-4 mb-6">
+                <h1 class="text-3xl font-extrabold text-gray-900">
+                    Confirmação de Pagamento
+                </h1>
+                <p class="mt-2 text-sm text-gray-600">Insira o ID do pedido para confirmar o pagamento (Boleto).</p>
+            </div>
+
+            <!-- Formulário de Busca -->
+            <form id="searchForm" class="flex items-center space-x-2 mb-6">
+                <input type="number" id="orderIdInput" name="orderId" required class="flex-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500" placeholder="Digite o ID do Pedido">
+                <button type="submit" class="bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2 px-4 rounded-md transition-colors">Buscar</button>
+            </form>
+
+            <!-- Detalhes do Pedido (escondido por padrão) -->
+            <div id="orderDetails" class="hidden space-y-4 border-t pt-6">
+                <h2 class="text-xl font-bold text-gray-800">Detalhes do Pedido</h2>
+                <div>
+                    <p><strong>ID do Pedido:</strong> <span id="order-id-display"></span></p>
+                    <p><strong>ID do Usuário:</strong> <span id="user-id-display"></span></p>
+                    <p><strong>Valor Total:</strong> <span id="total-amount-display"></span></p>
+                    <p><strong>Status Atual:</strong> <span id="status-display" class="font-semibold"></span></p>
+                </div>
+                <button id="confirmPaymentButton" class="w-full bg-green-600 hover:bg-green-700 text-white font-bold py-3 px-4 rounded-md transition-colors">
+                    Confirmar Pagamento Recebido
+                </button>
+            </div>
+            
+            <div id="message" class="text-center text-sm mt-4"></div>
+        </div>
+    </main>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const searchForm = document.getElementById('searchForm');
+            const orderIdInput = document.getElementById('orderIdInput');
+            const messageElement = document.getElementById('message');
+            const orderDetailsContainer = document.getElementById('orderDetails');
+            const confirmPaymentButton = document.getElementById('confirmPaymentButton');
+
+            const orderIdDisplay = document.getElementById('order-id-display');
+            const userIdDisplay = document.getElementById('user-id-display');
+            const totalAmountDisplay = document.getElementById('total-amount-display');
+            const statusDisplay = document.getElementById('status-display');
+
+            const API_URL = 'http://localhost:4001'; 
+            let currentOrder = null;
+
+            const statusMap = {
+                0: { text: 'Aguardando Pagamento', class: 'text-yellow-600' },
+                1: { text: 'Pago', class: 'text-green-600' },
+                2: { text: 'Cancelado', class: 'text-red-600' }
+            };
+
+            searchForm.addEventListener('submit', async (event) => {
+                event.preventDefault();
+                const orderId = orderIdInput.value;
+                if (!orderId) return;
+
+                messageElement.textContent = 'Buscando pedido...';
+                messageElement.className = 'text-gray-500';
+                orderDetailsContainer.classList.add('hidden');
+
+                try {
+                    const response = await fetch(`${API_URL}/orders/${orderId}`);
+                    if (!response.ok) {
+                        const errorData = await response.json();
+                        throw new Error(errorData.message || 'Pedido não encontrado.');
+                    }
+                    currentOrder = await response.json();
+                    
+                    // Preenche os detalhes do pedido
+                    orderIdDisplay.textContent = `#${currentOrder.id}`;
+                    userIdDisplay.textContent = currentOrder.userId;
+                    const orderTotal = currentOrder.orderProducts.reduce((acc, item) => acc + (item.price * item.amount), 0);
+                    totalAmountDisplay.textContent = `R$ ${orderTotal.toFixed(2).replace('.', ',')}`;
+                    
+                    const statusInfo = statusMap[currentOrder.paymentId] || { text: 'Desconhecido', class: 'text-gray-500' };
+                    statusDisplay.textContent = statusInfo.text;
+                    statusDisplay.className = `font-semibold ${statusInfo.class}`;
+
+                    // Habilita ou desabilita o botão de confirmação
+                    if (currentOrder.paymentId === 0) {
+                        confirmPaymentButton.disabled = false;
+                        confirmPaymentButton.classList.remove('bg-gray-400', 'cursor-not-allowed');
+                        confirmPaymentButton.classList.add('bg-green-600', 'hover:bg-green-700');
+                    } else {
+                        confirmPaymentButton.disabled = true;
+                        confirmPaymentButton.classList.add('bg-gray-400', 'cursor-not-allowed');
+                        confirmPaymentButton.classList.remove('bg-green-600', 'hover:bg-green-700');
+                    }
+
+                    orderDetailsContainer.classList.remove('hidden');
+                    messageElement.textContent = '';
+                } catch (error) {
+                    messageElement.textContent = `Erro: ${error.message}`;
+                    messageElement.className = 'text-red-600';
+                }
+            });
+
+            confirmPaymentButton.addEventListener('click', async () => {
+                if (!currentOrder) return;
+
+                confirmPaymentButton.disabled = true;
+                confirmPaymentButton.textContent = 'Processando...';
+                messageElement.textContent = '';
+
+                // SIMULAÇÃO:
+                // 1. Chamar o (futuro) payment-service para registrar o pagamento
+                console.log(`Simulando chamada ao Payment Service para confirmar o pedido ${currentOrder.id}`);
+                // const paymentResponse = await fetch(`${API_URL}/payments/confirm`, { method: 'POST', ... });
+
+                // 2. O payment-service processaria e publicaria um evento no NATS:
+                // natsClient.emit('payment.approved', { orderId: currentOrder.id, status: 1 });
+                console.log("O Payment Service publicaria o evento 'payment.approved'");
+
+                // 3. O order-service ouviria o evento e atualizaria o status do pedido.
+
+                setTimeout(() => {
+                    messageElement.textContent = `Pagamento do pedido #${currentOrder.id} confirmado com sucesso!`;
+                    messageElement.className = 'text-green-600';
+                    
+                    // Atualiza o status na tela
+                    const statusInfo = statusMap[1];
+                    statusDisplay.textContent = statusInfo.text;
+                    statusDisplay.className = `font-semibold ${statusInfo.class}`;
+                    confirmPaymentButton.disabled = true;
+                    confirmPaymentButton.classList.add('bg-gray-400', 'cursor-not-allowed');
+                    confirmPaymentButton.classList.remove('bg-green-600', 'hover:bg-green-700');
+
+                }, 1500);
+            });
+        });
+    </script>
+</body>
+</html>

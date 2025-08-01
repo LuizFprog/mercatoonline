@@ -26,4 +26,9 @@ export class LocationGatewayController extends BaseGatewayController {
       res: res,
     });
   }
+
+  @Get('cities/:cityId') 
+  proxyCities(@Req() req: Request, @Res() res: Response) {
+    return this.proxyRequest({ method: req.method as any, path: req.originalUrl, res, data: req.body });
+  }
 }

@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Delete, Param, Body, Res } from '@nestjs/common';
+import { Controller, Get, Post, Delete, Patch, Param, Body, Res } from '@nestjs/common';
 import { HttpService } from '@nestjs/axios';
 import { Response } from 'express';
 import { BaseGatewayController } from '../base.gateway.controller';
@@ -32,5 +32,15 @@ export class CartGatewayController extends BaseGatewayController {
   @Delete(':id')
   async deleteCart(@Param('id') id: string, @Res() res: Response) {
     await this.proxyRequest({ method: 'DELETE', path: `/${id}`, res });
+  }
+  
+  @Delete('products/:cartProductId')
+  async removeProductFromCart(@Param('cartProductId') cartProductId: string, @Res() res: Response) {
+    await this.proxyRequest({ method: 'DELETE', path: `/products/${cartProductId}`, res });
+  } 
+
+  @Patch('products/:cartProductId')
+  async updateProductInCart(@Param('cartProductId') cartProductId: string, @Body() updateProductDto: any, @Res() res: Response) {
+    await this.proxyRequest({ method: 'PATCH', path: `/products/${cartProductId}`, res, data: updateProductDto });
   }
 }

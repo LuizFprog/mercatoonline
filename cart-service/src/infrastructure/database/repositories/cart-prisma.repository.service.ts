@@ -19,7 +19,7 @@ export class CartPrismaRepository implements ICartRepository {
   }
 
   async findByUserId(userId: number): Promise<(Cart & { cartProducts: CartProduct[] }) | null> {
-    return this.prisma.cart.findUnique({
+    return this.prisma.cart.findFirst({
       where: { userId },
       include: { cartProducts: true },
     });
@@ -49,6 +49,37 @@ export class CartPrismaRepository implements ICartRepository {
 
   async findAllCart(): Promise<Cart[]> {
     return this.prisma.cart.findMany({
+      include: { cartProducts: true },
+    });
+  }
+
+  async updateProductAmount(cartProductId: number, amount: number, total: number): Promise<CartProduct> {
+    return this.prisma.cartProduct.update({
+      where: { id: cartProductId },
+      data: { amount, total },
+    });
+  }
+
+  async removeProduct(cartProductId: number): Promise<void> {
+    await this.prisma.cartProduct.delete({
+      where: { id: cartProductId },
+    });
+  }
+
+  async findCartProductById(cartProductId: number): Promise<CartProduct | null> {
+    return this.prisma.cartProduct.findUnique({ where: { id: cartProductId } });
+  }
+  
+  async updateStatus(cartId: number, status: string): Promise<Cart> {
+      return this.prisma.cart.update({
+          where: { id: cartId },
+          data: { status },
+      });
+  }
+
+   async findActiveByUserId(userId: number): Promise<(Cart & { cartProducts: CartProduct[] }) | null> {
+    return this.prisma.cart.findFirst({
+      where: { userId, status: 'active' }, 
       include: { cartProducts: true },
     });
   }

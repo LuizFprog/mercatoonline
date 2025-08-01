@@ -13,8 +13,8 @@ model Product {
   name          String
   price         Float
   brand         String
-  batch         String
-  validity      String
+  batch         String?
+  validity      String?
   image         String
   description   String?
   storeId       Int      @map("store_id")

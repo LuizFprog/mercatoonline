@@ -57,9 +57,10 @@ export class CreateOrderUseCase {
         
         const newOrder = await this.orderRepository.create(createOrderInput);
         
-        this.natsClient.emit('order.created', newOrder);
-        console.log(`[Order-Service] Evento 'order.created' publicado para o pedido ID: ${newOrder.id}`);
-
+        if (newOrder.id) {
+        this.natsClient.emit('order.created.from.cart', { cartId: newOrder.id });
+        console.log(`[Order-Service] Evento 'order.created.from.cart' publicado para o carrinho ID: ${newOrder.id}`);
+    }
         return newOrder;
     }
 

@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="pt-br" class="h-full bg-gray-100">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pagamento - Mercatto Online</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Inter', sans-serif; }
+        .tab-button.active {
+            border-color: #4f46e5; /* indigo-600 */
+            color: #4f46e5;
+            background-color: #eef2ff; /* indigo-50 */
+        }
+    </style>
+</head>
+<body class="h-full">
+    <!-- Cabeçalho -->
+    <header class="bg-white shadow-md sticky top-0 z-10">
+        <nav class="container mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center h-16">
+                <div class="flex-shrink-0">
+                    <a href="pagina_principal.html" class="text-2xl font-bold text-indigo-600">Mercatto Online</a>
+                </div>
+                <div class="flex items-center">
+                    <a href="listordem.html" class="text-sm font-medium text-gray-500 hover:text-gray-700">Meus Pedidos</a>
+                </div>
+            </div>
+        </nav>
+    </header>
+
+    <!-- Conteúdo Principal -->
+    <main class="container mx-auto max-w-lg py-12 px-4 sm:px-6 lg:px-8">
+        <div class="bg-white p-8 rounded-xl shadow-lg">
+            <div class="text-center border-b pb-4 mb-6">
+                <h1 class="text-3xl font-extrabold text-gray-900">
+                    Efetuar Pagamento
+                </h1>
+                <p class="mt-2 text-sm text-gray-500">Pedido <span id="order-id" class="font-bold text-indigo-600">#...</span></p>
+            </div>
+
+            <!-- Abas de Navegação -->
+            <div class="mb-6">
+                <div class="border-b border-gray-200">
+                    <nav class="-mb-px flex space-x-4" aria-label="Tabs">
+                        <button data-tab="card" class="tab-button active whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm">Cartão de Crédito</button>
+                        <button data-tab="pix" class="tab-button whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm text-gray-500 hover:text-gray-700 hover:border-gray-300">Pix</button>
+                        <button data-tab="boleto" class="tab-button whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm text-gray-500 hover:text-gray-700 hover:border-gray-300">Boleto</button>
+                    </nav>
+                </div>
+            </div>
+
+            <!-- Conteúdo das Abas -->
+            <div id="payment-content">
+                <!-- Aba Cartão de Crédito -->
+                <div id="card-content" class="tab-content">
+                    <form id="paymentForm" class="space-y-4">
+                        <div>
+                            <label for="card-number" class="block text-sm font-medium text-gray-700">Número do Cartão</label>
+                            <input type="text" id="card-number" name="card-number" required class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500" placeholder="0000 0000 0000 0000">
+                        </div>
+                        <div>
+                            <label for="card-name" class="block text-sm font-medium text-gray-700">Nome no Cartão</label>
+                            <input type="text" id="card-name" name="card-name" required class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500" placeholder="Nome Completo">
+                        </div>
+                        <div class="flex space-x-4">
+                            <div class="flex-1">
+                                <label for="card-expiry" class="block text-sm font-medium text-gray-700">Validade</label>
+                                <input type="text" id="card-expiry" name="card-expiry" required class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500" placeholder="MM/AA">
+                            </div>
+                            <div class="flex-1">
+                                <label for="card-cvc" class="block text-sm font-medium text-gray-700">CVC</label>
+                                <input type="text" id="card-cvc" name="card-cvc" required class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500" placeholder="123">
+                            </div>
+                        </div>
+                        <button type="submit" id="submitButton" class="w-full mt-6 bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3 px-4 rounded-md transition-colors">
+                            Pagar R$ <span id="total-amount">0,00</span>
+                        </button>
+                    </form>
+                </div>
+
+                <!-- Aba Pix -->
+                <div id="pix-content" class="tab-content hidden text-center py-8">
+                    <p class="text-gray-600">Funcionalidade de pagamento com Pix em breve!</p>
+                </div>
+
+                <!-- Aba Boleto -->
+                <div id="boleto-content" class="tab-content hidden text-center py-8">
+                     <p class="text-gray-600">Funcionalidade de pagamento com Boleto em breve!</p>
+                </div>
+            </div>
+            
+            <div id="message" class="text-center text-sm mt-4"></div>
+        </div>
+    </main>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', async () => {
+            const messageElement = document.getElementById('message');
+            const orderIdElement = document.getElementById('order-id');
+            const totalAmountElement = document.getElementById('total-amount');
+            const submitButton = document.getElementById('submitButton');
+            const tabs = document.querySelectorAll('.tab-button');
+            const tabContents = document.querySelectorAll('.tab-content');
+
+            const API_URL = 'http://localhost:4001'; 
+            
+            const urlParams = new URLSearchParams(window.location.search);
+            const orderId = urlParams.get('orderId');
+
+            if (!orderId) {
+                messageElement.textContent = 'Erro: ID do pedido não fornecido. Retorne para a lista de pedidos.';
+                messageElement.className = 'text-red-600';
+                return;
+            }
+
+            orderIdElement.textContent = `#${orderId}`;
+
+            async function fetchOrderTotal() {
+                try {
+                    const response = await fetch(`${API_URL}/orders/${orderId}`);
+                    if (!response.ok) throw new Error('Não foi possível carregar os dados do pedido.');
+                    const order = await response.json();
+                    const orderTotal = order.orderProducts.reduce((acc, item) => acc + (item.price * item.amount), 0);
+                    totalAmountElement.textContent = orderTotal.toFixed(2).replace('.', ',');
+                } catch (error) {
+                    messageElement.textContent = `Erro: ${error.message}`;
+                    messageElement.className = 'text-red-600';
+                    submitButton.disabled = true;
+                }
+            }
+
+            tabs.forEach(tab => {
+                tab.addEventListener('click', () => {
+                    tabs.forEach(t => t.classList.remove('active'));
+                    tab.classList.add('active');
+
+                    tabContents.forEach(content => {
+                        if (content.id === `${tab.dataset.tab}-content`) {
+                            content.classList.remove('hidden');
+                        } else {
+                            content.classList.add('hidden');
+                        }
+                    });
+                });
+            });
+
+            document.getElementById('paymentForm').addEventListener('submit', async (event) => {
+                event.preventDefault();
+                submitButton.disabled = true;
+                submitButton.textContent = 'Processando...';
+                messageElement.textContent = '';
+
+                // Simulação de chamada ao serviço de pagamento
+                // Aqui você faria a chamada real para o payment-service
+                console.log('Simulando pagamento para o pedido:', orderId);
+
+                setTimeout(() => {
+                    // Simulação de sucesso
+                    // O payment-service publicaria um evento 'payment.approved'
+                    // O order-service ouviria esse evento e atualizaria o status do pedido para 1 (pago)
+                    
+                    messageElement.textContent = 'Pagamento aprovado com sucesso! Redirecionando...';
+                    messageElement.className = 'text-green-600';
+
+                    setTimeout(() => {
+                        window.location.href = 'listordem.html';
+                    }, 2000);
+
+                }, 1500);
+            });
+
+            await fetchOrderTotal();
+        });
+    </script>
+</body>
+</html>

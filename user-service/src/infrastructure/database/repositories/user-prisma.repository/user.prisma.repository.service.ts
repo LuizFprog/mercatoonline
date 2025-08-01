@@ -74,7 +74,6 @@ export class UserPrismaRepository implements IUserRepository {
       return await this.prisma.user.update({
         where: { id },
         data,
-        select: this.userSelect,
       });
     } catch (error) {
       if (error instanceof Prisma.PrismaClientKnownRequestError && error.code === 'P2025') {

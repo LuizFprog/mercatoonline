@@ -1,14 +1,12 @@
-// src/application/use-cases/update-user/update-user.use-case.ts
-
-import { Inject, Injectable, NotFoundException } from '@nestjs/common';
+import { Inject, Injectable } from '@nestjs/common';
 import { IUserRepository } from 'src/domain/interface.repository/user.interface.repository/user.repository.interface';
 import { User, Prisma } from '@prisma/client';
-import { UpdateUserDto } from 'src/interfaces/dto/update.user.dto/update.user.tdo'; // Corrigido o caminho do DTO
+import { UpdateUserDto } from 'src/interfaces/dto/update.user.dto/update.user.tdo';
 import * as bcrypt from 'bcrypt';
 import { ClientProxy } from '@nestjs/microservices';
 
 @Injectable()
-export class UpdateUser {
+export class UpdateUserUseCase {
   constructor(
     @Inject(IUserRepository)
     private readonly userRepository: IUserRepository,
@@ -17,32 +15,35 @@ export class UpdateUser {
   ) {}
 
   async execute(id: number, data: UpdateUserDto): Promise<Omit<User, 'password'>> {
-    
-    const dataToUpdate=data;
+    const { address, password, ...userData } = data;
 
-    const existingUser = await this.userRepository.findById(id);
+    const updatePayload: Prisma.UserUpdateInput = {
+      ...userData,
+    };
 
-    if (!existingUser) {
-      throw new NotFoundException(`Usuário com ID ${id} não encontrado.`);
+    if (password) {
+      updatePayload.password = await bcrypt.hash(password, 10);
     }
 
-    if (data.password) {
-         
-      const saltRounds = 10;
-      const hashedPassword = await bcrypt.hash(data.password, saltRounds);
-    
-      dataToUpdate.password = hashedPassword;
+    if (address) {
+      // Atualiza o primeiro endereço encontrado para este usuário.
+      updatePayload.addresses = {
+        updateMany: {
+          where: { userId: id },
+          data: address,
+        },
+      };
     }
 
-    const userUpdate = await this.userRepository.update(id, dataToUpdate)
-
+    const userUpdate = await this.userRepository.update(id, updatePayload);
+    
     try {
       this.natsClient.emit('user.updated', userUpdate);
-      console.log(`Evento 'user.updated' publicado para o usuário ID: ${userUpdate.email}`);
+      console.log(`Evento 'user.updated' publicado para o usuário: ${userUpdate.email}`);
     } catch (error) {
       console.error('ERRO ao publicar evento no NATS:', error);
     }
-  
+ 
     return userUpdate;
   }
 }

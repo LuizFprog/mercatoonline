@@ -1,7 +1,7 @@
 import { Controller, Get, Param, Patch, Post, Delete, Body, ParseIntPipe } from '@nestjs/common';
 import { CreateUser } from 'src/application/use-cases/create-user';
 import { FindUserById } from 'src/application/use-cases/find-user-by-id';
-import { UpdateUser } from 'src/application/use-cases/update-user';
+import { UpdateUserUseCase } from 'src/application/use-cases/update-user';
 import { DeleteUser } from 'src/application/use-cases/delete.user';
 import { FindUserAll } from 'src/application/use-cases/find.all.user';
 import { FindByEmail } from 'src/application/use-cases/find.by.email'
@@ -17,7 +17,7 @@ export class UsersController {
         private readonly findUserById: FindUserById,
         private readonly findByEmail: FindByEmail,
         private readonly findAllUser: FindUserAll,
-        private readonly updateUser_: UpdateUser,
+        private readonly updateUser_: UpdateUserUseCase,
         private readonly deleteUserUseCase: DeleteUser,
         private readonly findByCPF: FindByCPF,
         private readonly findByPhone: FindByPhone,

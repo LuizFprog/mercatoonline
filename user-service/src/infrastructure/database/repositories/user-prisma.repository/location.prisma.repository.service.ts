@@ -23,4 +23,11 @@ export class LocationPrismaRepository implements ILocationRepository {
       },
     });
   }
+
+  async findCityById(cityId: number): Promise<(City & { state: State }) | null> {
+    return this.prisma.city.findUnique({
+      where: { id: cityId },
+      include: { state: true },
+    });
+  }
 }

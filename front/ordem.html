@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="pt-br" class="h-full bg-gray-100">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Detalhes do Pedido - Mercatto Online</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Inter', sans-serif; }
+    </style>
+</head>
+<body class="h-full">
+    <!-- Cabeçalho -->
+    <header class="bg-white shadow-md sticky top-0 z-10">
+        <nav class="container mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center h-16">
+                <div class="flex-shrink-0">
+                    <a href="pagina_principal.html" class="text-2xl font-bold text-indigo-600">Mercatto Online</a>
+                </div>
+                <div class="flex items-center">
+                    <a href="listordem.html" class="text-sm font-medium text-gray-500 hover:text-gray-700">Meus Pedidos</a>
+                </div>
+            </div>
+        </nav>
+    </header>
+
+    <!-- Conteúdo Principal -->
+    <main class="container mx-auto max-w-3xl py-12 px-4 sm:px-6 lg:px-8">
+        <div id="order-container" class="bg-white p-8 rounded-xl shadow-lg hidden">
+            <div class="border-b pb-4 mb-6">
+                <h1 class="text-3xl font-extrabold text-gray-900">
+                    Detalhes do Pedido <span id="order-id" class="text-indigo-600"></span>
+                </h1>
+                <p class="mt-2 text-sm text-gray-500">Criado em: <span id="order-date"></span></p>
+            </div>
+
+            <!-- Status do Pedido -->
+            <div id="status-badge" class="mb-6 p-4 rounded-md text-center font-semibold">
+                <!-- O status será preenchido aqui -->
+            </div>
+
+            <!-- Lista de Produtos -->
+            <div id="order-items" class="space-y-4">
+                <!-- Os produtos do pedido serão inseridos aqui -->
+            </div>
+
+            <!-- Resumo Financeiro -->
+            <div class="mt-8 border-t pt-6">
+                <div class="space-y-2">
+                    <div class="flex justify-between text-gray-600">
+                        <span>Subtotal</span>
+                        <span id="subtotal">R$ 0,00</span>
+                    </div>
+                    <div class="flex justify-between text-gray-600">
+                        <span>Frete</span>
+                        <span>Grátis</span>
+                    </div>
+                    <div class="flex justify-between text-xl font-bold text-gray-900">
+                        <span>Total</span>
+                        <span id="total">R$ 0,00</span>
+                    </div>
+                </div>
+                <button id="paymentButton" class="mt-6 w-full bg-green-600 hover:bg-green-700 text-white font-bold py-3 px-4 rounded-md transition-colors">
+                    Pagar Agora
+                </button>
+            </div>
+        </div>
+        
+        <div id="message" class="text-center text-lg mt-4"></div>
+    </main>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', async () => {
+            const orderContainer = document.getElementById('order-container');
+            const orderIdElement = document.getElementById('order-id');
+            const orderDateElement = document.getElementById('order-date');
+            const statusBadge = document.getElementById('status-badge');
+            const orderItemsContainer = document.getElementById('order-items');
+            const subtotalElement = document.getElementById('subtotal');
+            const totalElement = document.getElementById('total');
+            const paymentButton = document.getElementById('paymentButton');
+            const messageElement = document.getElementById('message');
+
+            const API_URL = 'http://localhost:4001'; 
+            
+            const urlParams = new URLSearchParams(window.location.search);
+            const orderId = urlParams.get('id');
+
+            if (!orderId) {
+                messageElement.textContent = 'Erro: ID do pedido não fornecido.';
+                messageElement.className = 'text-red-600';
+                return;
+            }
+
+            const statusMap = {
+                0: { text: 'Aguardando Pagamento', class: 'bg-yellow-100 text-yellow-800' },
+                1: { text: 'Pago', class: 'bg-green-100 text-green-800' },
+                2: { text: 'Cancelado', class: 'bg-red-100 text-red-800' }
+            };
+
+            function renderOrder(order) {
+                orderIdElement.textContent = `#${order.id}`;
+                orderDateElement.textContent = new Date(order.createdAt).toLocaleDateString('pt-BR', { day: '2-digit', month: 'long', year: 'numeric' });
+
+                const statusInfo = statusMap[order.paymentId] || { text: 'Status Desconhecido', class: 'bg-gray-100 text-gray-800' };
+                statusBadge.textContent = statusInfo.text;
+                statusBadge.className += ` ${statusInfo.class}`;
+
+                if (order.paymentId !== 0) { // Se não estiver aguardando pagamento, desabilita o botão
+                    paymentButton.disabled = true;
+                    paymentButton.textContent = `Pedido ${statusInfo.text}`;
+                    paymentButton.className = 'mt-6 w-full bg-gray-400 text-white font-bold py-3 px-4 rounded-md cursor-not-allowed';
+                }
+
+                orderItemsContainer.innerHTML = '';
+                let subtotal = 0;
+
+                order.orderProducts.forEach(item => {
+                    const itemTotal = item.price * item.amount;
+                    subtotal += itemTotal;
+                    const itemHtml = `
+                        <div class="flex items-center justify-between p-4 border-b">
+                            <div class="flex items-center space-x-4">
+                                <img src="front/assets/image/logo_product.jpg" alt="Produto" class="w-16 h-16 rounded-md object-cover">
+                                <div>
+                                    <h2 class="font-semibold text-gray-800">Produto ID: ${item.productId}</h2>
+                                    <p class="text-sm text-gray-500">${item.amount} x R$ ${item.price.toFixed(2).replace('.', ',')}</p>
+                                </div>
+                            </div>
+                            <p class="font-semibold text-gray-800">R$ ${itemTotal.toFixed(2).replace('.', ',')}</p>
+                        </div>
+                    `;
+                    orderItemsContainer.insertAdjacentHTML('beforeend', itemHtml);
+                });
+
+                subtotalElement.textContent = `R$ ${subtotal.toFixed(2).replace('.', ',')}`;
+                totalElement.textContent = `R$ ${subtotal.toFixed(2).replace('.', ',')}`;
+                
+                orderContainer.classList.remove('hidden');
+            }
+
+            async function fetchOrderData() {
+                try {
+                    messageElement.textContent = 'Carregando pedido...';
+                    const response = await fetch(`${API_URL}/orders/${orderId}`);
+                    if (!response.ok) {
+                        const errorData = await response.json();
+                        throw new Error(errorData.message || 'Não foi possível carregar os dados do pedido.');
+                    }
+                    const orderData = await response.json();
+                    renderOrder(orderData);
+                    messageElement.textContent = '';
+                } catch (error) {
+                    messageElement.textContent = `Erro: ${error.message}`;
+                    messageElement.className = 'text-red-600 text-center';
+                }
+            }
+            
+            paymentButton.addEventListener('click', () => {
+                window.location.href = `pagamento.html?orderId=${orderId}`;
+            });
+
+            // Iniciar o processo de carregamento de dados
+            await fetchOrderData();
+        });
+    </script>
+</body>
+</html>

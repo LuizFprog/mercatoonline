@@ -1,28 +1,22 @@
-import { IsString, IsNotEmpty, IsEmail, IsInt, Min, Max, ValidateNested,MinLength } from 'class-validator';
-import { Type } from 'class-transformer'
-import { CreateAddressDto } from '../create-address.dto/create-address.dto'
+import { IsString, IsOptional, IsEmail, MinLength, ValidateNested } from 'class-validator';
+import { Type } from 'class-transformer';
 
+class UpdateAddressDto {
+  @IsString() @IsOptional() street?: string;
+  @IsOptional() number?: number;
+  @IsString() @IsOptional() complement?: string;
+  @IsString() @IsOptional() cep?: string;
+  @IsOptional() cityId?: number;
+}
 
 export class UpdateUserDto {
- 
-  @IsEmail()
-  email?: string;
-
-  @IsInt()
-  @Min(1)
-  @Max(2)
-  typeUser?: number;
-
-  @IsString()
-  phone?: string;
-
-  @IsString()
-  @MinLength(6, { message: 'A senha deve ter no mínimo 6 caracteres' })
-  password?: string;
-
-  @IsNotEmpty()
-  @ValidateNested() 
-  @Type(() => CreateAddressDto)
-  address?: CreateAddressDto;
+  @IsString() @IsOptional() name?: string;
+  @IsEmail() @IsOptional() email?: string;
+  @IsString() @IsOptional() phone?: string;
+  @IsString() @IsOptional() @MinLength(6) password?: string;
   
+  @IsOptional()
+  @ValidateNested()
+  @Type(() => UpdateAddressDto)
+  address?: UpdateAddressDto;
 }

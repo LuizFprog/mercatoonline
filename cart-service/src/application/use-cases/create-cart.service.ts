@@ -10,10 +10,10 @@ export class CreateCartUseCase {
   ) {}
   
   async execute(data: CreateCartDto) {
-    const cartExists = await this.cartRepository.findByUserId(data.userId);
-    if (cartExists){
-      throw new ConflictException(`Carrinho para o usuário com ID ${data.userId} já existe.`);
-    } 
-    return this.cartRepository.create({ userId: data.userId });
+    const cartExists = await this.cartRepository.findActiveByUserId(data.userId);
+    if (cartExists) {
+      throw new ConflictException(`O usuário com ID ${data.userId} já possui um carrinho ativo.`);
+    }
+    return this.cartRepository.create({ userId: data.userId, status: 'active' });
   }
 }

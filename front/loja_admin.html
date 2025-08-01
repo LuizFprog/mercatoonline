@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="pt-br" class="h-full bg-gray-100">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Painel da Loja - Mercatto Online</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Inter', sans-serif; }
+    </style>
+</head>
+<body class="h-full">
+    <!-- Cabeçalho -->
+    <header class="bg-white shadow-md sticky top-0 z-10">
+        <nav class="container mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center h-16">
+                <div class="flex-shrink-0">
+                    <a href="pagina_principal.html" class="text-2xl font-bold text-indigo-600">Mercatto Online</a>
+                </div>
+                <div class="flex items-center">
+                    <a href="pagina_principal.html" class="text-sm font-medium text-gray-500 hover:text-gray-700">Voltar à Loja</a>
+                </div>
+            </div>
+        </nav>
+    </header>
+
+    <!-- Conteúdo Principal -->
+    <main class="container mx-auto max-w-7xl py-12 px-4 sm:px-6 lg:px-8">
+        <div class="bg-white p-8 rounded-xl shadow-lg">
+            <div class="flex flex-col md:flex-row justify-between items-start md:items-center border-b pb-4 mb-6">
+                <div>
+                    <!-- CORREÇÃO: O h1 agora está dentro de um link -->
+                    <a href="#" id="edit-store-link" class="hover:text-indigo-700 transition-colors" title="Clique para editar o perfil da loja">
+                        <h1 id="store-name" class="text-3xl font-extrabold text-gray-900">
+                            Carregando...
+                        </h1>
+                    </a>
+                    <p class="mt-2 text-sm text-gray-500">Gerencie os produtos da sua loja.</p>
+                </div>
+                <a href="cadastro_Produtos.html" class="mt-4 md:mt-0 w-full md:w-auto inline-flex items-center justify-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700">
+                    Cadastrar Novo Produto
+                </a>
+            </div>
+
+            <div id="message" class="text-center text-lg my-4"></div>
+            
+            <!-- Tabela de Produtos -->
+            <div class="overflow-x-auto">
+                <table class="min-w-full divide-y divide-gray-200">
+                    <thead class="bg-gray-50">
+                        <tr>
+                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">ID</th>
+                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Produto</th>
+                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Estoque</th>
+                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Valor</th>
+                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Validade</th>
+                            <th scope="col" class="relative px-6 py-3">
+                                <span class="sr-only">Editar</span>
+                            </th>
+                        </tr>
+                    </thead>
+                    <tbody id="products-table-body" class="bg-white divide-y divide-gray-200">
+                        <!-- Linhas da tabela serão inseridas aqui -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', async () => {
+            const storeNameElement = document.getElementById('store-name');
+            const editStoreLink = document.getElementById('edit-store-link'); // Pega o novo elemento <a>
+            const productsTableBody = document.getElementById('products-table-body');
+            const messageElement = document.getElementById('message');
+
+            const API_URL = 'http://localhost:4001'; 
+            
+            const storeId = localStorage.getItem('storeId'); 
+
+            if (!storeId) {
+                messageElement.textContent = 'Erro: Loja não autenticada. Redirecionando para login...';
+                messageElement.className = 'text-red-600';
+                setTimeout(() => window.location.href = 'login.html', 3000);
+                return;
+            }
+
+            function renderProductsTable(products) {
+                productsTableBody.innerHTML = '';
+                if (products.length === 0) {
+                    messageElement.textContent = 'Nenhum produto cadastrado ainda.';
+                    messageElement.className = 'text-gray-500';
+                    return;
+                }
+                
+                products.forEach(product => {
+                    const priceFormatted = `R$ ${product.price.toFixed(2).replace('.', ',')}`;
+                    const validityFormatted = product.validity ? new Date(product.validity).toLocaleDateString('pt-BR') : 'N/A';
+
+                    const row = `
+                        <tr class="hover:bg-gray-50">
+                            <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">${product.id}</td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-800">${product.name}</td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${product.stockQuantity || 0}</td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${priceFormatted}</td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${validityFormatted}</td>
+                            <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                                <a href="atualizar_produto.html?id=${product.id}" class="text-indigo-600 hover:text-indigo-900">Editar</a>
+                            </td>
+                        </tr>
+                    `;
+                    productsTableBody.insertAdjacentHTML('beforeend', row);
+                });
+            }
+
+            async function fetchStoreAndProducts() {
+                try {
+                    messageElement.textContent = 'Carregando dados da loja...';
+                    
+                    const storeResponse = await fetch(`${API_URL}/stores/${storeId}`);
+                    if (!storeResponse.ok) throw new Error('Não foi possível carregar os dados da loja.');
+                    const storeData = await storeResponse.json();
+                    
+                    storeNameElement.textContent = storeData.name;
+                    // CORREÇÃO: Define o link para a página de atualização da loja
+                    editStoreLink.href = `atualizar_loja.html?id=${storeId}`;
+
+                    const productsResponse = await fetch(`${API_URL}/products`);
+                    if (!productsResponse.ok) throw new Error('Não foi possível carregar os produtos.');
+                    const allProducts = await productsResponse.json();
+
+                    const storeProducts = allProducts.filter(p => p.storeId === parseInt(storeId, 10));
+                    
+                    messageElement.textContent = '';
+                    renderProductsTable(storeProducts);
+
+                } catch (error) {
+                    messageElement.textContent = `Erro: ${error.message}`;
+                    messageElement.className = 'text-red-600 text-center';
+                }
+            }
+
+            await fetchStoreAndProducts();
+        });
+    </script>
+</body>
+</html>

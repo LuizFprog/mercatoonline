@@ -7,6 +7,7 @@ import { OrdersGatewayModule } from './orders/orders.gateway.module';
 import { CartGatewayModule } from './cart/cart.gateway.module';
 import { AppController } from './app.controller';
 import { LocationGatewayModule } from './users/location.gateway.module';
+import { AuthGatewayModule } from './users/auth.gateway.module';
 
 @Module({
   imports: [
@@ -17,6 +18,7 @@ import { LocationGatewayModule } from './users/location.gateway.module';
     StoreGatewayModule,
     CartGatewayModule, 
     LocationGatewayModule, 
+    AuthGatewayModule,
   ],
   controllers: [AppController],
 })

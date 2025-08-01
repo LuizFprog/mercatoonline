@@ -31,8 +31,8 @@ export class CreateStoreUseCase {
 
     const newStore = await this.storeRepository.create(createInput);
 
-    this.natsClient.emit('store.created', newStore);
-    console.log(`[Store-Service] Evento 'store.created' publicado para a loja ID: ${newStore.email}`);
+    this.natsClient.emit('user.became.store_owner', {userId: newStore.userId });
+    console.log(`[Store-Service] Evento 'user.became.store_owner' publicado para o usuário ID: ${newStore.userId}`)
 
     return newStore;
   }

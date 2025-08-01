@@ -12,6 +12,7 @@ export class StorePrismaRepository implements IStoreRepository {
     email: true,
     cnpj: true,
     phone: true,
+    description: true,
     logo_url: true,
     userId: true,
     createdAt: true,

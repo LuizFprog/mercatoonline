@@ -5,6 +5,7 @@ import { FindAllStatesUseCase } from 'src/application/use-cases/find-all-states.
 import { FindCitiesByStateUseCase } from 'src/application/use-cases/find-cities-by-state.use-case';
 import { ILocationRepository } from 'src/domain/interface.repository/user.interface.repository/location.interface.repository';
 import { LocationPrismaRepository } from '../database/repositories/user-prisma.repository/location.prisma.repository.service';
+import { FindCityByIdUseCase } from 'src/application/use-cases/find-city-by-id.use-case';
 
 @Module({
   imports: [PrismaModule],
@@ -12,6 +13,7 @@ import { LocationPrismaRepository } from '../database/repositories/user-prisma.r
   providers: [
     FindAllStatesUseCase,
     FindCitiesByStateUseCase,
+    FindCityByIdUseCase,
     {
       provide: ILocationRepository,
       useClass: LocationPrismaRepository,

@@ -19,7 +19,7 @@ export class CreateProductDto {
 
   @IsString()
   @IsNotEmpty()
-  description: string;
+  description?: string;
 
   @IsInt()
   @IsNotEmpty()
@@ -27,11 +27,11 @@ export class CreateProductDto {
 
   @IsString()
   @IsNotEmpty()
-  batch: string;
+  batch?: string;
 
   @IsString()
   @IsNotEmpty()
-  validity: string;
+  validity?: string;
 
   @IsInt()
   @IsNotEmpty()
