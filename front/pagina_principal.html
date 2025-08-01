@@ -95,23 +95,50 @@
             const userId = localStorage.getItem('userId'); 
             const token = localStorage.getItem('access_token');
 
-            function checkUserStatus() {
-                const storeId = localStorage.getItem('storeId');
+            async function checkUserStatus() {
                 if (token && userId) {
                     loggedOutLinks.classList.add('hidden');
                     loggedInLinks.classList.remove('hidden');
 
-                    if (storeId) {
-                        storeAdminLink.classList.remove('hidden');
-                        createStoreLink.classList.add('hidden');
-                    } else {
-                        storeAdminLink.classList.add('hidden');
-                        createStoreLink.classList.remove('hidden');
+                    try {
+                        // Busca os dados do usuário para verificar o typeUser
+                        const userResponse = await fetch(`${API_URL}/users/${userId}`);
+                        if (!userResponse.ok) {
+                            // Se o usuário não for encontrado, limpa o login
+                            throw new Error('Sessão inválida.');
+                        }
+                        const user = await userResponse.json();
+
+                        // Se o usuário for um lojista (typeUser 2), busca a loja
+                        if (user.typeUser === 2) {
+                            const storesResponse = await fetch(`${API_URL}/stores`);
+                            const stores = await storesResponse.json();
+                            const userStore = stores.find(store => store.userId === parseInt(userId, 10));
+                            
+                            if (userStore) {
+                                localStorage.setItem('storeId', userStore.id);
+                                storeAdminLink.classList.remove('hidden');
+                                createStoreLink.classList.add('hidden');
+                            } else {
+                                storeAdminLink.classList.add('hidden');
+                                createStoreLink.classList.remove('hidden');
+                            }
+                        } else {
+                             // Se não for lojista, garante que o link de criar loja apareça
+                            storeAdminLink.classList.add('hidden');
+                            createStoreLink.classList.remove('hidden');
+                        }
+                    } catch (error) {
+                        console.error("Erro ao verificar status do usuário:", error);
+                        // Em caso de erro (ex: token expirado), limpa o localStorage e desloga
+                        localStorage.clear();
+                        window.location.reload();
                     }
                 } else {
                     loggedOutLinks.classList.remove('hidden');
                     loggedInLinks.classList.add('hidden');
                 }
+
             }
 
             logoutButton.addEventListener('click', () => {
